@@ -17,11 +17,30 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("img", {
-        name: "Indeksert utvikling for scenarioet",
+        name: "Indekserte indikatorer for scenarioet",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "Boligbestand for scenarioet",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "Boligendringer for scenarioet",
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("columnheader", { name: "Kommunal" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Total" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Selveid" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Privatleid" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Oslo-kommunale grep")).toBeInTheDocument();
     expect(screen.getByText("Statlige grep")).toBeInTheDocument();
@@ -32,8 +51,10 @@ describe("App", () => {
       screen.getByText(/Kommunalt disponerte boliger/),
     ).toBeInTheDocument();
     expect(screen.getByText("Total boligbestand")).toBeInTheDocument();
+    expect(screen.getByText("Selveide boliger")).toBeInTheDocument();
+    expect(screen.getByText("Privatleide boliger")).toBeInTheDocument();
     expect(
-      screen.getByText(/Total boligbestand starter på 100/),
+      screen.getByText(/Boligprisindeks og privat leiepress/),
     ).toBeInTheDocument();
   });
 

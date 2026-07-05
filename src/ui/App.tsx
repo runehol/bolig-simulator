@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { defaultScenarioInputs, modelStart } from "../model/start-values";
 import { simulateScenario } from "../model/simulation";
@@ -29,7 +29,6 @@ type ScenarioFormState = ScenarioUrlState;
 type ChartSeries = {
   key: string;
   label: string;
-  normalization: "own-start" | "total-housing-stock-start";
   color: string;
   values: number[];
 };
@@ -167,7 +166,7 @@ const totalHousingStock = (housingStock: HousingStock) =>
   housingStock.municipal +
   housingStock.nonCommercial;
 
-const normalizeSeries = (values: number[], baseValue: number) => {
+const normalizeValues = (values: number[], baseValue: number) => {
   if (baseValue === 0) {
     return values.map(() => 100);
   }
@@ -181,16 +180,23 @@ const buildPath = (
   maxValue: number,
   width: number,
   height: number,
-  padding: number,
+  padding: {
+    bottom: number;
+    left: number;
+    right: number;
+    top: number;
+  },
 ) => {
   const range = Math.max(1, maxValue - minValue);
-  const plotWidth = width - padding * 2;
-  const plotHeight = height - padding * 2;
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
 
   return values
     .map((value, index) => {
-      const x = padding + (plotWidth * index) / Math.max(1, values.length - 1);
-      const y = height - padding - ((value - minValue) / range) * plotHeight;
+      const x =
+        padding.left + (plotWidth * index) / Math.max(1, values.length - 1);
+      const y =
+        height - padding.bottom - ((value - minValue) / range) * plotHeight;
       const command = index === 0 ? "M" : "L";
 
       return `${command} ${x.toFixed(2)} ${y.toFixed(2)}`;
@@ -198,41 +204,76 @@ const buildPath = (
     .join(" ");
 };
 
-const buildChartSeries = (years: SimulationYearResult[]): ChartSeries[] => [
+const buildIndicatorSeries = (years: SimulationYearResult[]): ChartSeries[] => [
+  {
+    key: "price",
+    label: "Boligprisindeks",
+    color: "#365f91",
+    values: normalizeValues(
+      years.map((year) => year.state.housingPriceIndex),
+      years[0].state.housingPriceIndex,
+    ),
+  },
+  {
+    key: "pressure",
+    label: "Privat leiepress",
+    color: "#82612b",
+    values: normalizeValues(
+      years.map((year) => year.privateRentalPressure),
+      years[0].privateRentalPressure,
+    ),
+  },
+];
+
+const buildHousingStockSeries = (
+  years: SimulationYearResult[],
+): ChartSeries[] => [
   {
     key: "totalHousingStock",
     label: "Total boligbestand",
     color: "#17211c",
-    normalization: "total-housing-stock-start",
     values: years.map((year) => totalHousingStock(year.state.housingStock)),
   },
   {
     key: "municipal",
     label: "Kommunal boligbestand",
     color: "#b13f2d",
-    normalization: "total-housing-stock-start",
     values: years.map((year) => year.state.housingStock.municipal),
+  },
+  {
+    key: "ownerOccupied",
+    label: "Selveide boliger",
+    color: "#6f5b9a",
+    values: years.map((year) => year.state.housingStock.ownerOccupied),
+  },
+  {
+    key: "privateRental",
+    label: "Privatleide boliger",
+    color: "#a05d3b",
+    values: years.map((year) => year.state.housingStock.privateRental),
   },
   {
     key: "nonCommercial",
     label: "Ikke-kommersiell boligbestand",
     color: "#276e62",
-    normalization: "total-housing-stock-start",
     values: years.map((year) => year.state.housingStock.nonCommercial),
   },
+];
+
+const buildHousingChangeSeries = (
+  years: SimulationYearResult[],
+): ChartSeries[] => [
   {
-    key: "price",
-    label: "Boligprisindeks",
+    key: "started",
+    label: "Igangsatte boliger",
     color: "#365f91",
-    normalization: "own-start",
-    values: years.map((year) => year.state.housingPriceIndex),
+    values: years.map((year) => year.startedDwellings),
   },
   {
-    key: "pressure",
-    label: "Privat leiepress",
+    key: "completed",
+    label: "Ferdigstilte boliger",
     color: "#82612b",
-    normalization: "own-start",
-    values: years.map((year) => year.privateRentalPressure),
+    values: years.map((year) => year.completedDwellings),
   },
 ];
 
@@ -299,37 +340,42 @@ function ScenarioControl({
   );
 }
 
-function IndexedLineChart({
-  firstYearTotalHousingStock,
+function LineChart({
+  ariaLabel,
+  referenceValue,
+  valueFloor,
   years,
   series,
 }: {
-  firstYearTotalHousingStock: number;
+  ariaLabel: string;
+  referenceValue?: number;
+  valueFloor?: number;
   years: number[];
   series: ChartSeries[];
 }) {
   const width = 860;
   const height = 320;
-  const padding = 42;
-  const normalizedSeries = series.map((item) => ({
-    ...item,
-    values: normalizeSeries(
-      item.values,
-      item.normalization === "total-housing-stock-start"
-        ? firstYearTotalHousingStock
-        : item.values[0],
+  const padding = {
+    bottom: 42,
+    left: 88,
+    right: 42,
+    top: 36,
+  };
+  const allValues = series.flatMap((item) => item.values);
+  const minValue = Math.min(valueFloor ?? referenceValue ?? 0, ...allValues);
+  const maxValue = Math.max(referenceValue ?? 0, ...allValues);
+  const middleValue = referenceValue ?? minValue + (maxValue - minValue) / 2;
+  const gridValues = Array.from(
+    new Set(
+      [minValue, middleValue, maxValue].map((value) => Math.round(value)),
     ),
-  }));
-  const allValues = normalizedSeries.flatMap((item) => item.values);
-  const minValue = Math.min(95, ...allValues);
-  const maxValue = Math.max(105, ...allValues);
-  const gridValues = [minValue, 100, maxValue];
+  );
 
   return (
     <figure className="m-0">
       <div className="overflow-x-auto rounded-lg border border-[#ddd8cd] bg-white">
         <svg
-          aria-label="Indeksert utvikling for scenarioet"
+          aria-label={ariaLabel}
           className="block min-w-[720px]"
           role="img"
           viewBox={`0 0 ${width} ${height}`}
@@ -338,17 +384,17 @@ function IndexedLineChart({
           {gridValues.map((value) => {
             const y =
               height -
-              padding -
+              padding.bottom -
               ((value - minValue) / Math.max(1, maxValue - minValue)) *
-                (height - padding * 2);
+                (height - padding.top - padding.bottom);
 
             return (
               <g key={value}>
                 <line
                   stroke="#e7e0d4"
                   strokeWidth="1"
-                  x1={padding}
-                  x2={width - padding}
+                  x1={padding.left}
+                  x2={width - padding.right}
                   y1={y}
                   y2={y}
                 />
@@ -356,7 +402,7 @@ function IndexedLineChart({
                   fill="#68746d"
                   fontSize="12"
                   textAnchor="end"
-                  x={padding - 10}
+                  x={padding.left - 10}
                   y={y + 4}
                 >
                   {formatMetricValue(value, 0)}
@@ -367,20 +413,20 @@ function IndexedLineChart({
           <line
             stroke="#cfc7b8"
             strokeWidth="1.5"
-            x1={padding}
-            x2={padding}
-            y1={padding}
-            y2={height - padding}
+            x1={padding.left}
+            x2={padding.left}
+            y1={padding.top}
+            y2={height - padding.bottom}
           />
           <line
             stroke="#cfc7b8"
             strokeWidth="1.5"
-            x1={padding}
-            x2={width - padding}
-            y1={height - padding}
-            y2={height - padding}
+            x1={padding.left}
+            x2={width - padding.right}
+            y1={height - padding.bottom}
+            y2={height - padding.bottom}
           />
-          {normalizedSeries.map((item) => (
+          {series.map((item) => (
             <path
               d={buildPath(
                 item.values,
@@ -404,8 +450,9 @@ function IndexedLineChart({
             }
 
             const x =
-              padding +
-              ((width - padding * 2) * index) / Math.max(1, years.length - 1);
+              padding.left +
+              ((width - padding.left - padding.right) * index) /
+                Math.max(1, years.length - 1);
 
             return (
               <text
@@ -435,6 +482,46 @@ function IndexedLineChart({
         ))}
       </figcaption>
     </figure>
+  );
+}
+
+function ChartPanel({
+  ariaLabel,
+  children,
+  referenceValue,
+  series,
+  title,
+  valueFloor,
+  years,
+}: {
+  ariaLabel: string;
+  children: ReactNode;
+  referenceValue?: number;
+  series: ChartSeries[];
+  title: string;
+  valueFloor?: number;
+  years: number[];
+}) {
+  return (
+    <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+      <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <div>
+          <h2 className="m-0 text-xl font-semibold">{title}</h2>
+          <div className="m-0 mt-1 text-sm text-[#68746d]">{children}</div>
+        </div>
+        <p className="m-0 text-sm font-semibold text-[#435048]">
+          {modelStart.startYear}-{modelStart.endYear}
+        </p>
+      </div>
+
+      <LineChart
+        ariaLabel={ariaLabel}
+        referenceValue={referenceValue}
+        series={series}
+        valueFloor={valueFloor}
+        years={years}
+      />
+    </section>
   );
 }
 
@@ -469,12 +556,11 @@ export function App() {
   );
   const years = simulation.years;
   const chartYears = years.map((year) => year.year);
-  const chartSeries = buildChartSeries(years);
+  const indicatorSeries = buildIndicatorSeries(years);
+  const housingStockSeries = buildHousingStockSeries(years);
+  const housingChangeSeries = buildHousingChangeSeries(years);
   const firstYear = years[0];
   const lastYear = years[years.length - 1];
-  const firstYearTotalHousingStock = totalHousingStock(
-    firstYear.state.housingStock,
-  );
 
   useEffect(() => {
     const nextSearch = serializeScenarioSearch(formState);
@@ -585,36 +671,48 @@ export function App() {
             />
           </div>
 
-          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
-            <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-              <div>
-                <h2 className="m-0 text-xl font-semibold">
-                  Utvikling over tid
-                </h2>
-                <p className="m-0 mt-1 text-sm text-[#68746d]">
-                  Boligbestand er indeksert mot total boligbestand i første
-                  modellår = 100. Tabellen viser faktiske verdier.
-                </p>
-              </div>
-              <p className="m-0 text-sm font-semibold text-[#435048]">
-                {modelStart.startYear}-{modelStart.endYear}
-              </p>
-            </div>
+          <ChartPanel
+            ariaLabel="Indekserte indikatorer for scenarioet"
+            referenceValue={100}
+            series={indicatorSeries}
+            title="Indikatorer"
+            valueFloor={95}
+            years={chartYears}
+          >
+            Boligprisindeks og privat leiepress er indeksert til 100 i første
+            modellår.
+          </ChartPanel>
 
-            <IndexedLineChart
-              firstYearTotalHousingStock={firstYearTotalHousingStock}
-              series={chartSeries}
-              years={chartYears}
-            />
-            <div className="mt-4 grid gap-3 border-t border-[#eee8dd] pt-4 text-sm leading-snug text-[#435048] md:grid-cols-2">
+          <ChartPanel
+            ariaLabel="Boligbestand for scenarioet"
+            series={housingStockSeries}
+            title="Boligbestand"
+            valueFloor={0}
+            years={chartYears}
+          >
+            Faktiske beholdninger etter disposisjonsform og total boligbestand.
+          </ChartPanel>
+
+          <ChartPanel
+            ariaLabel="Boligendringer for scenarioet"
+            series={housingChangeSeries}
+            title="Boligendringer"
+            valueFloor={0}
+            years={chartYears}
+          >
+            Faktiske årlige strømmer for igangsatte og ferdigstilte boliger.
+          </ChartPanel>
+
+          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+            <div className="grid gap-3 text-sm leading-snug text-[#435048] md:grid-cols-2">
               <p className="m-0">
-                Total boligbestand starter på 100. Kommunal og ikke-kommersiell
-                boligbestand vises som andel av samme starttotal, slik at
-                nivåene kan sammenlignes.
+                Indikatorer vises som indeks for å gjøre utviklingen
+                sammenlignbar. Boligbestand og boligendringer vises som faktiske
+                modellverdier.
               </p>
               <p className="m-0">
                 Første prototype bruker grove startverdier og ukalibrerte
-                regler. Tabellen under viser de faktiske modellverdiene.
+                regler. Tabellen under viser samme verdier år for år.
               </p>
             </div>
           </section>
@@ -626,7 +724,10 @@ export function App() {
                 <thead>
                   <tr className="border-b border-[#ddd8cd] text-[#68746d]">
                     <th className="py-2 pr-4 font-semibold">År</th>
+                    <th className="py-2 pr-4 font-semibold">Total</th>
                     <th className="py-2 pr-4 font-semibold">Kommunal</th>
+                    <th className="py-2 pr-4 font-semibold">Selveid</th>
+                    <th className="py-2 pr-4 font-semibold">Privatleid</th>
                     <th className="py-2 pr-4 font-semibold">
                       Ikke-kommersiell
                     </th>
@@ -644,7 +745,22 @@ export function App() {
                     >
                       <td className="py-2 pr-4 font-semibold">{year.year}</td>
                       <td className="py-2 pr-4">
+                        {formatMetricValue(
+                          totalHousingStock(year.state.housingStock),
+                        )}
+                      </td>
+                      <td className="py-2 pr-4">
                         {formatMetricValue(year.state.housingStock.municipal)}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(
+                          year.state.housingStock.ownerOccupied,
+                        )}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(
+                          year.state.housingStock.privateRental,
+                        )}
                       </td>
                       <td className="py-2 pr-4">
                         {formatMetricValue(
