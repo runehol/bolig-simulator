@@ -8,13 +8,14 @@ Live side: <https://runehol.github.io/bolig-simulator/>
 Stacken følger designnotatet:
 
 - TypeScript for simuleringsmotor og datamodell
-- React, Tailwind CSS og Vite for brukergrensesnitt og statisk bygg
+- React, Apache ECharts, Tailwind CSS og Vite for brukergrensesnitt og statisk
+  bygg
 - GitHub Pages og GitHub Actions for første deploy
 
 Første scenarioverksted kjører en deterministisk modell i nettleseren, med
-slidere, nummerfelt, normalisert tidsseriegraf, tabell med faktiske verdier og
-korte delbare scenario-URL-er. Standardverdier er implisitte i URL-en, slik at
-bare scenarioavvik skrives til adressefeltet.
+slidere, nummerfelt, ECharts-grafer med hover og sluttverdier, tabell med
+faktiske verdier og korte delbare scenario-URL-er. Standardverdier er implisitte
+i URL-en, slik at bare scenarioavvik skrives til adressefeltet.
 
 ## Kom i gang
 

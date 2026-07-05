@@ -208,8 +208,8 @@ Mål: gjøre output lesbart uten at brukeren må forstå modellkoden.
 - [x] Legg korte forklaringer på hvert outputmål.
 - [x] Skill tydelig mellom Oslo-kommunale grep, statlige grep og eksterne
       makroforutsetninger.
-- [x] Vurder første grafbibliotek; ikke innfør det før behovet er tydeligere enn
-      i første SVG-graf.
+- [x] Innfør Apache ECharts for hover, legend, akser og sluttverdier når
+      egenbygget SVG-graf ikke lenger er nok.
 - [x] Vis minst én tidsserie for kommunal eller ikke-kommersiell boligbestand.
 - [x] Vis minst én indikator for leiepress eller boutgiftsbelastning.
 - [x] Legg inn tekstlig usikkerhetsmerking for eksempeldata og ukalibrerte

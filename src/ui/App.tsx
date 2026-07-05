@@ -13,6 +13,7 @@ import {
   serializeScenarioSearch,
   type ScenarioUrlState,
 } from "../routing/scenario-url";
+import { ScenarioChart, type ScenarioChartSeries } from "./ScenarioChart";
 
 type ControlDefinition = {
   id: keyof ScenarioFormState;
@@ -26,12 +27,7 @@ type ControlDefinition = {
 
 type ScenarioFormState = ScenarioUrlState;
 
-type ChartSeries = {
-  key: string;
-  label: string;
-  color: string;
-  values: number[];
-};
+type ChartSeries = ScenarioChartSeries;
 
 const controls: ControlDefinition[] = [
   {
@@ -174,36 +170,6 @@ const normalizeValues = (values: number[], baseValue: number) => {
   return values.map((value) => (value / baseValue) * 100);
 };
 
-const buildPath = (
-  values: number[],
-  minValue: number,
-  maxValue: number,
-  width: number,
-  height: number,
-  padding: {
-    bottom: number;
-    left: number;
-    right: number;
-    top: number;
-  },
-) => {
-  const range = Math.max(1, maxValue - minValue);
-  const plotWidth = width - padding.left - padding.right;
-  const plotHeight = height - padding.top - padding.bottom;
-
-  return values
-    .map((value, index) => {
-      const x =
-        padding.left + (plotWidth * index) / Math.max(1, values.length - 1);
-      const y =
-        height - padding.bottom - ((value - minValue) / range) * plotHeight;
-      const command = index === 0 ? "M" : "L";
-
-      return `${command} ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
-};
-
 const buildIndicatorSeries = (years: SimulationYearResult[]): ChartSeries[] => [
   {
     key: "price",
@@ -340,151 +306,6 @@ function ScenarioControl({
   );
 }
 
-function LineChart({
-  ariaLabel,
-  referenceValue,
-  valueFloor,
-  years,
-  series,
-}: {
-  ariaLabel: string;
-  referenceValue?: number;
-  valueFloor?: number;
-  years: number[];
-  series: ChartSeries[];
-}) {
-  const width = 860;
-  const height = 320;
-  const padding = {
-    bottom: 42,
-    left: 88,
-    right: 42,
-    top: 36,
-  };
-  const allValues = series.flatMap((item) => item.values);
-  const minValue = Math.min(valueFloor ?? referenceValue ?? 0, ...allValues);
-  const maxValue = Math.max(referenceValue ?? 0, ...allValues);
-  const middleValue = referenceValue ?? minValue + (maxValue - minValue) / 2;
-  const gridValues = Array.from(
-    new Set(
-      [minValue, middleValue, maxValue].map((value) => Math.round(value)),
-    ),
-  );
-
-  return (
-    <figure className="m-0">
-      <div className="overflow-x-auto rounded-lg border border-[#ddd8cd] bg-white">
-        <svg
-          aria-label={ariaLabel}
-          className="block min-w-[720px]"
-          role="img"
-          viewBox={`0 0 ${width} ${height}`}
-        >
-          <rect fill="#ffffff" height={height} width={width} />
-          {gridValues.map((value) => {
-            const y =
-              height -
-              padding.bottom -
-              ((value - minValue) / Math.max(1, maxValue - minValue)) *
-                (height - padding.top - padding.bottom);
-
-            return (
-              <g key={value}>
-                <line
-                  stroke="#e7e0d4"
-                  strokeWidth="1"
-                  x1={padding.left}
-                  x2={width - padding.right}
-                  y1={y}
-                  y2={y}
-                />
-                <text
-                  fill="#68746d"
-                  fontSize="12"
-                  textAnchor="end"
-                  x={padding.left - 10}
-                  y={y + 4}
-                >
-                  {formatMetricValue(value, 0)}
-                </text>
-              </g>
-            );
-          })}
-          <line
-            stroke="#cfc7b8"
-            strokeWidth="1.5"
-            x1={padding.left}
-            x2={padding.left}
-            y1={padding.top}
-            y2={height - padding.bottom}
-          />
-          <line
-            stroke="#cfc7b8"
-            strokeWidth="1.5"
-            x1={padding.left}
-            x2={width - padding.right}
-            y1={height - padding.bottom}
-            y2={height - padding.bottom}
-          />
-          {series.map((item) => (
-            <path
-              d={buildPath(
-                item.values,
-                minValue,
-                maxValue,
-                width,
-                height,
-                padding,
-              )}
-              fill="none"
-              key={item.key}
-              stroke={item.color}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="3"
-            />
-          ))}
-          {years.map((year, index) => {
-            if (index !== 0 && index !== years.length - 1) {
-              return null;
-            }
-
-            const x =
-              padding.left +
-              ((width - padding.left - padding.right) * index) /
-                Math.max(1, years.length - 1);
-
-            return (
-              <text
-                fill="#68746d"
-                fontSize="12"
-                key={year}
-                textAnchor={index === 0 ? "start" : "end"}
-                x={x}
-                y={height - 12}
-              >
-                {year}
-              </text>
-            );
-          })}
-        </svg>
-      </div>
-      <figcaption className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#435048]">
-        {series.map((item) => (
-          <span className="inline-flex items-center gap-2" key={item.key}>
-            <span
-              aria-hidden="true"
-              className="h-2.5 w-6 rounded-full"
-              style={{ backgroundColor: item.color }}
-            />
-            {item.label}
-          </span>
-        ))}
-      </figcaption>
-    </figure>
-  );
-}
-
 function ChartPanel({
   ariaLabel,
   children,
@@ -514,13 +335,32 @@ function ChartPanel({
         </p>
       </div>
 
-      <LineChart
+      <ScenarioChart
         ariaLabel={ariaLabel}
         referenceValue={referenceValue}
         series={series}
         valueFloor={valueFloor}
         years={years}
       />
+      <div className="mt-4 grid gap-2 border-t border-[#eee8dd] pt-4 sm:grid-cols-2 lg:grid-cols-3">
+        {series.map((item) => {
+          const finalValue = item.values[item.values.length - 1] ?? 0;
+
+          return (
+            <div className="flex items-baseline gap-2 text-sm" key={item.key}>
+              <span
+                aria-hidden="true"
+                className="h-2.5 w-5 rounded-full"
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="text-[#435048]">{item.label}</span>
+              <span className="ml-auto font-semibold text-[#17211c]">
+                {formatMetricValue(finalValue)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }
