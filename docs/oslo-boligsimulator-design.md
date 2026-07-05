@@ -586,19 +586,76 @@ tomte- og arealpotensial
 Privat utbyggers beslutning om å starte prosjekt bør avhenge av forventet
 lønnsomhet og risiko.
 
-Mulig enkel regel:
+Første modell bør derfor ha en enkel boligprisindeks som mellomvariabel.
+Boligprisindeksen trenger ikke være en presis prognose eller hovedoutput i
+første versjon, men den trengs for å gi riktig kausal retning:
+
+```text
+husholdningsvekst og etterspørselspress
+  -> boligprisindeks
+  -> privat prosjektmargin
+  -> igangsetting
+  -> ferdigstilte boliger
+  -> boligbestand
+  -> lavere press
+```
+
+Mulig første regel for prisindeksen:
+
+```text
+boligprisindeks neste år =
+  boligprisindeks i år
+  * (
+      1
+      + etterspørselspress-effekt
+      + inntektsvekst-effekt
+      - renteeffekt
+      - tilbudseffekt
+    )
+```
+
+Her bør boligprisindeksen behandles som en modellert mellomvariabel med tydelig
+usikkerhetsmerking, ikke som et kalibrert boligprisnivå.
+
+Mulig enkel regel for privat prosjektmargin:
 
 ```text
 forventet prosjektmargin =
-  forventet salgspris eller kapitalisert leieverdi
-  - tomtekostnad
-  - byggekostnad
+  boligprisindeks
+  - byggekostnadsindeks
   - finansieringskostnad
-  - rekkefølgekrav og andre prosjektkostnader
+  - kostnad ved ikke-kommersielt krav
+  - marginterskel
 ```
 
 Hvis forventet prosjektmargin er høy nok, øker igangsettingen. Hvis marginen
 faller under terskel, utsettes eller stoppes prosjekter.
+
+Mulig første stock-flow-regel:
+
+```text
+igangsettingsandel =
+  begrens(
+    normal igangsettingsandel
+    + marginfølsomhet * forventet prosjektmargin,
+    minimumsandel,
+    maksimumsandel
+  )
+
+igangsatte boliger =
+  regulert backlog * igangsettingsandel
+
+regulert backlog neste år =
+  regulert backlog
+  + ny regulert kapasitet
+  - igangsatte boliger
+
+ferdigstilte boliger =
+  igangsatte boliger fra tidligere år etter byggetidsforsinkelse
+```
+
+Dette gjør ferdigstilte boliger til modelloutput i framtidsscenarioer, ikke en
+ren eksogen input.
 
 Viktige drivere:
 
@@ -626,8 +683,8 @@ Politisk påvirkning:
 
 Åpent modellspørsmål:
 
-- Skal første prototype modellere privat utbyggingsrespons med en enkel
-  marginregel, eller starte med historisk ferdigstilling som input?
+- Hvordan skal første marginregel vektes mellom boligprisindeks, rente,
+  byggekostnad og ikke-kommersielt krav?
 - Hvordan skal reguleringsreserve og faktisk tomtetilgang estimeres per bydel?
 - Hvordan skal kommunale krav til ikke-kommersiell andel påvirke privat
   prosjektmargin?
@@ -636,11 +693,13 @@ Politisk påvirkning:
 
 Anbefaling:
 
-Første prototype kan fortsatt bruke historisk ferdigstilling som input i
-backtest, men framtidsscenarioer bør ha en enkel privat utbyggingsrespons fra
-starten. Ellers blir modellen for svak på et av de viktigste politiske
-spørsmålene: om kommunale og statlige grep faktisk øker, flytter, bremser eller
-endrer sammensetningen av nybygging.
+Første prototype bør ha privat utbyggingsrespons fra starten. I historisk
+backtest kan faktisk ferdigstilling fortsatt brukes som evalueringsdata eller,
+for enkelte isolerte tester, som observert input. I framtidsscenarioer bør
+ferdigstilling derimot komme fra pipeline- og utbyggingsresponsmodulen. Ellers
+blir modellen for svak på et av de viktigste politiske spørsmålene: om kommunale
+og statlige grep faktisk øker, flytter, bremser eller endrer sammensetningen av
+nybygging.
 
 ### Nybygg til boligbestand
 
@@ -904,6 +963,13 @@ Mulige drivere:
 - befolkningsvekst
 - utlånsstramhet
 
+I første modell bør boligprisindeksen først og fremst brukes som mellomvariabel
+for privat utbyggingsrespons. Høyere boligprisindeks øker forventet
+prosjektmargin, mens høyere rente, byggekostnad og eventuelle krav uten
+finansiering trekker marginen ned. Dermed kan modellen vise hvorfor høyere
+etterspørsel kan gi mer bygging, men også hvorfor byggingen kan stoppe opp når
+kostnadene eller finansieringsrisikoen blir for høy.
+
 Åpent:
 
 - Hvor mye trenger modellen å treffe boligpris for å være nyttig politisk?
@@ -1020,8 +1086,10 @@ Første tekniske prototype bør være:
 - tre politiske spaker: kommunale kjøp, kommunale salg og ikke-kommersiell andel
   av nybygg
 - tre eksterne spaker: rente, befolkningsvekst og byggekostnad
-- en enkel privat utbyggingsrespons basert på prosjektmargin og tilgjengelig
-  regulert kapasitet
+- en enkel modellert boligprisindeks som mellomvariabel for privat
+  utbyggingsrespons
+- en enkel privat utbyggingsrespons basert på boligprisindeks, prosjektmargin,
+  byggekostnad, rente og tilgjengelig regulert kapasitet
 - output: kommunal boligbestand, privat leiepress, ikke-kommersiell
   boligbestand, igangsatte/ferdigstilte boliger og husholdninger med høy
   boutgiftsbelastning

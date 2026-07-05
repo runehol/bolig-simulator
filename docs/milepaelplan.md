@@ -42,12 +42,15 @@ Mål: lukke de viktigste valgene før modellkoden blir for bred.
   - befolkningsvekst
   - byggekostnad
 
-- [ ] Avklar om første modell skal ha privat utbyggingsrespons fra starten,
-      eller om ferdigstilte boliger midlertidig kan være eksogen input.
+- [ ] Bekreft at første framtidsmodell skal beregne ferdigstilte boliger gjennom
+      en enkel privat utbyggingsrespons.
+- [ ] Avklar startverdier for boligprisindeks, regulert backlog, igangsatte
+      boliger og byggetidsforsinkelse.
 - [ ] Velg første outputsett for UI:
 
   - kommunal boligbestand
   - ikke-kommersiell boligbestand
+  - modellert boligprisindeks
   - privat leiepress
   - igangsatte og ferdigstilte boliger
   - husholdninger med høy boutgiftsbelastning
@@ -68,12 +71,20 @@ Mål: etablere en ren modellkjerne uten UI-avhengigheter.
 - [ ] Lag en starttilstand for hele Oslo med tydelig merkede eksempelverdier.
 - [ ] Implementer en enkel årlig simuleringsløkke.
 - [ ] La politiske input og eksterne input ekspanderes til komplett tidslinje.
+- [ ] Implementer en enkel modellert boligprisindeks som mellomvariabel.
+- [ ] Implementer regulert backlog, igangsatte boliger, boliger under bygging og
+      ferdigstilte boliger som egen pipeline.
+- [ ] Implementer privat igangsetting som respons på boligprisindeks,
+      byggekostnad, rente, ikke-kommersielt krav og regulert kapasitet.
 - [ ] Implementer kommunale kjøp og salg som stock-flow-regler.
 - [ ] Implementer ikke-kommersiell andel av nybygg som egen beholdningsregel.
 - [ ] Implementer en første leiepressindikator.
 - [ ] Legg til enhetstester for:
 
   - stabil gjentakbarhet
+  - høyere boligprisindeks øker privat igangsetting når andre forhold er like
+  - høyere rente eller byggekostnad reduserer privat igangsetting
+  - igangsatte boliger blir ferdigstilt etter valgt byggetidsforsinkelse
   - kommunale kjøp øker kommunal boligbestand
   - kommunale salg reduserer kommunal boligbestand
   - ikke-kommersiell nybyggandel øker ikke-kommersiell beholdning
@@ -215,7 +226,7 @@ Disse temaene er viktige, men bør ikke styre første modellkjerne:
 
 ## Nærmeste anbefalte arbeid
 
-Start med milepæl 0 og 1. Den viktigste første avklaringen er om framtidig
-nybygging skal beregnes med en enkel privat utbyggingsrespons fra starten, eller
-om første tekniske modell midlertidig skal bruke ferdigstilte boliger som
-eksogen input.
+Start med milepæl 0 og 1. Den viktigste første avklaringen er startverdier og
+parametre for boligprisindeks, regulert backlog, igangsettingsrespons og
+byggetidsforsinkelse. Framtidig ferdigstilling skal beregnes gjennom den enkle
+private utbyggingsresponsen fra starten.
