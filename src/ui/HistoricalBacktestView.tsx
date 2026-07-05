@@ -105,15 +105,17 @@ export function HistoricalBacktestView() {
 
   return (
     <section className="grid gap-6">
-      <div>
-        <h2 className="m-0 text-2xl font-semibold">Historisk test</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#435048]">
+      <header className="max-w-5xl">
+        <h1 className="m-0 text-3xl leading-[1.1] tracking-normal sm:text-5xl">
+          Historisk test
+        </h1>
+        <p className="mt-4 max-w-3xl text-base text-[#435048]">
           Første backtest kjører modellen for {periodLabel} med observerte
           igangsettinger og historisk styringsrente. Den tester foreløpig
           pipeline, ferdigstillelser og boligbestand før vi kalibrerer
           utbyggerresponsen.
         </p>
-      </div>
+      </header>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard

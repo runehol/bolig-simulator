@@ -247,182 +247,203 @@ export function ScenarioWorkshopView({
   const periodLabel = `${modelStart.startYear}-${modelStart.endYear}`;
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[23rem_1fr]">
-      <aside className="self-start rounded-lg border border-[#ddd8cd] bg-white p-5">
-        <h2 className="m-0 text-xl font-semibold">Scenario</h2>
-        <p className="mt-2 text-sm text-[#68746d]">
-          Slidere gir rask utforsking. Nummerfeltene kan brukes for presise
-          verdier.
+    <>
+      <header className="mb-8 max-w-5xl">
+        <h1 className="m-0 text-3xl leading-[1.1] tracking-normal sm:text-5xl">
+          Scenarioverksted
+        </h1>
+        <p className="mt-4 max-w-3xl text-base text-[#435048]">
+          Første modell kjører hele Oslo fra {modelStart.startYear} til{" "}
+          {modelStart.endYear}. Tallene er grove startverdier og skal brukes til
+          å teste modellstruktur.
         </p>
+      </header>
 
-        {controlGroups.map((group) => {
-          const groupControls = controls.filter(
-            (control) => control.group === group.id,
-          );
+      <div className="grid gap-6 xl:grid-cols-[23rem_1fr]">
+        <aside className="self-start rounded-lg border border-[#ddd8cd] bg-white p-5">
+          <h2 className="m-0 text-xl font-semibold">Scenario</h2>
+          <p className="mt-2 text-sm text-[#68746d]">
+            Slidere gir rask utforsking. Nummerfeltene kan brukes for presise
+            verdier.
+          </p>
 
-          return (
-            <section className="mt-6" key={group.id}>
-              <h3 className="m-0 text-sm font-bold text-[#435048] uppercase">
-                {group.id}
-              </h3>
-              <p className="mt-1 text-sm leading-snug text-[#68746d]">
-                {group.description}
+          {controlGroups.map((group) => {
+            const groupControls = controls.filter(
+              (control) => control.group === group.id,
+            );
+
+            return (
+              <section className="mt-6" key={group.id}>
+                <h3 className="m-0 text-sm font-bold text-[#435048] uppercase">
+                  {group.id}
+                </h3>
+                <p className="mt-1 text-sm leading-snug text-[#68746d]">
+                  {group.description}
+                </p>
+                <div className="mt-2">
+                  {groupControls.length === 0 ? (
+                    <p className="m-0 rounded-md border border-dashed border-[#cfc7b8] bg-[#fbf8f1] p-3 text-sm text-[#68746d]">
+                      Ingen aktiv kontroll i første prototype.
+                    </p>
+                  ) : (
+                    groupControls.map((control) => (
+                      <ScenarioControl
+                        definition={control}
+                        key={control.id}
+                        onChange={updateFormValue}
+                        value={formState[control.id]}
+                      />
+                    ))
+                  )}
+                </div>
+              </section>
+            );
+          })}
+        </aside>
+
+        <section className="grid gap-6">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryCard
+              explanation="Kommunalt disponerte boliger etter kjøp, salg og modellert beholdningsendring."
+              label="Kommunale boliger"
+              value={`${formatMetricValue(firstYear.state.housingStock.municipal)} -> ${formatMetricValue(lastYear.state.housingStock.municipal)}`}
+            />
+            <SummaryCard
+              explanation="Boliger utenfor ordinær kommersiell eier- og leiemodell, bygget opp gjennom nybyggandelen."
+              label="Ikke-kommersielle"
+              value={`${formatMetricValue(firstYear.state.housingStock.nonCommercial)} -> ${formatMetricValue(lastYear.state.housingStock.nonCommercial)}`}
+            />
+            <SummaryCard
+              explanation="Modellert prisnivå der 100 er startnivået. Brukes foreløpig som driver for privat bygging."
+              label="Boligprisindeks"
+              value={`${formatMetricValue(firstYear.state.housingPriceIndex, 1)} -> ${formatMetricValue(lastYear.state.housingPriceIndex, 1)}`}
+            />
+            <SummaryCard
+              explanation="Indikator for press i privat leiemarked. Høyere verdi betyr strammere marked i modellen."
+              label="Privat leiepress"
+              value={`${formatMetricValue(firstYear.privateRentalPressure, 2)} -> ${formatMetricValue(lastYear.privateRentalPressure, 2)}`}
+            />
+          </div>
+
+          <ChartPanel
+            ariaLabel="Indekserte indikatorer for scenarioet"
+            periodLabel={periodLabel}
+            referenceValue={100}
+            series={indicatorSeries}
+            title="Indikatorer"
+            valueFloor={95}
+            years={chartYears}
+          >
+            Boligprisindeks og privat leiepress er indeksert til 100 i første
+            modellår.
+          </ChartPanel>
+
+          <ChartPanel
+            ariaLabel="Boligbestand for scenarioet"
+            periodLabel={periodLabel}
+            series={housingStockSeries}
+            title="Boligbestand"
+            valueFloor={0}
+            years={chartYears}
+          >
+            Faktiske beholdninger etter disposisjonsform og total boligbestand.
+          </ChartPanel>
+
+          <ChartPanel
+            ariaLabel="Boligendringer for scenarioet"
+            periodLabel={periodLabel}
+            series={housingChangeSeries}
+            title="Boligendringer"
+            valueFloor={0}
+            years={chartYears}
+          >
+            Faktiske årlige strømmer for igangsatte og ferdigstilte boliger.
+          </ChartPanel>
+
+          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+            <div className="grid gap-3 text-sm leading-snug text-[#435048] md:grid-cols-2">
+              <p className="m-0">
+                Indikatorer vises som indeks for å gjøre utviklingen
+                sammenlignbar. Boligbestand og boligendringer vises som faktiske
+                modellverdier.
               </p>
-              <div className="mt-2">
-                {groupControls.length === 0 ? (
-                  <p className="m-0 rounded-md border border-dashed border-[#cfc7b8] bg-[#fbf8f1] p-3 text-sm text-[#68746d]">
-                    Ingen aktiv kontroll i første prototype.
-                  </p>
-                ) : (
-                  groupControls.map((control) => (
-                    <ScenarioControl
-                      definition={control}
-                      key={control.id}
-                      onChange={updateFormValue}
-                      value={formState[control.id]}
-                    />
-                  ))
-                )}
-              </div>
-            </section>
-          );
-        })}
-      </aside>
+              <p className="m-0">
+                Første prototype bruker grove startverdier og ukalibrerte
+                regler. Tabellen under viser samme verdier år for år.
+              </p>
+            </div>
+          </section>
 
-      <section className="grid gap-6">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <SummaryCard
-            explanation="Kommunalt disponerte boliger etter kjøp, salg og modellert beholdningsendring."
-            label="Kommunale boliger"
-            value={`${formatMetricValue(firstYear.state.housingStock.municipal)} -> ${formatMetricValue(lastYear.state.housingStock.municipal)}`}
-          />
-          <SummaryCard
-            explanation="Boliger utenfor ordinær kommersiell eier- og leiemodell, bygget opp gjennom nybyggandelen."
-            label="Ikke-kommersielle"
-            value={`${formatMetricValue(firstYear.state.housingStock.nonCommercial)} -> ${formatMetricValue(lastYear.state.housingStock.nonCommercial)}`}
-          />
-          <SummaryCard
-            explanation="Modellert prisnivå der 100 er startnivået. Brukes foreløpig som driver for privat bygging."
-            label="Boligprisindeks"
-            value={`${formatMetricValue(firstYear.state.housingPriceIndex, 1)} -> ${formatMetricValue(lastYear.state.housingPriceIndex, 1)}`}
-          />
-          <SummaryCard
-            explanation="Indikator for press i privat leiemarked. Høyere verdi betyr strammere marked i modellen."
-            label="Privat leiepress"
-            value={`${formatMetricValue(firstYear.privateRentalPressure, 2)} -> ${formatMetricValue(lastYear.privateRentalPressure, 2)}`}
-          />
-        </div>
-
-        <ChartPanel
-          ariaLabel="Indekserte indikatorer for scenarioet"
-          periodLabel={periodLabel}
-          referenceValue={100}
-          series={indicatorSeries}
-          title="Indikatorer"
-          valueFloor={95}
-          years={chartYears}
-        >
-          Boligprisindeks og privat leiepress er indeksert til 100 i første
-          modellår.
-        </ChartPanel>
-
-        <ChartPanel
-          ariaLabel="Boligbestand for scenarioet"
-          periodLabel={periodLabel}
-          series={housingStockSeries}
-          title="Boligbestand"
-          valueFloor={0}
-          years={chartYears}
-        >
-          Faktiske beholdninger etter disposisjonsform og total boligbestand.
-        </ChartPanel>
-
-        <ChartPanel
-          ariaLabel="Boligendringer for scenarioet"
-          periodLabel={periodLabel}
-          series={housingChangeSeries}
-          title="Boligendringer"
-          valueFloor={0}
-          years={chartYears}
-        >
-          Faktiske årlige strømmer for igangsatte og ferdigstilte boliger.
-        </ChartPanel>
-
-        <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
-          <div className="grid gap-3 text-sm leading-snug text-[#435048] md:grid-cols-2">
-            <p className="m-0">
-              Indikatorer vises som indeks for å gjøre utviklingen
-              sammenlignbar. Boligbestand og boligendringer vises som faktiske
-              modellverdier.
-            </p>
-            <p className="m-0">
-              Første prototype bruker grove startverdier og ukalibrerte regler.
-              Tabellen under viser samme verdier år for år.
-            </p>
-          </div>
-        </section>
-
-        <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
-          <h2 className="m-0 text-xl font-semibold">Årstabell</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[760px] border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-[#ddd8cd] text-[#68746d]">
-                  <th className="py-2 pr-4 font-semibold">År</th>
-                  <th className="py-2 pr-4 font-semibold">Total</th>
-                  <th className="py-2 pr-4 font-semibold">Kommunal</th>
-                  <th className="py-2 pr-4 font-semibold">Selveid</th>
-                  <th className="py-2 pr-4 font-semibold">Privatleid</th>
-                  <th className="py-2 pr-4 font-semibold">Ikke-kommersiell</th>
-                  <th className="py-2 pr-4 font-semibold">Prisindeks</th>
-                  <th className="py-2 pr-4 font-semibold">Leiepress</th>
-                  <th className="py-2 pr-4 font-semibold">Igangsatt</th>
-                  <th className="py-2 pr-4 font-semibold">Ferdigstilt</th>
-                </tr>
-              </thead>
-              <tbody>
-                {years.map((year) => (
-                  <tr
-                    className="border-b border-[#eee8dd] last:border-0"
-                    key={year.year}
-                  >
-                    <td className="py-2 pr-4 font-semibold">{year.year}</td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(
-                        totalHousingStock(year.state.housingStock),
-                      )}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(year.state.housingStock.municipal)}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(year.state.housingStock.ownerOccupied)}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(year.state.housingStock.privateRental)}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(year.state.housingStock.nonCommercial)}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(year.state.housingPriceIndex, 1)}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(year.privateRentalPressure, 2)}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(year.startedDwellings)}
-                    </td>
-                    <td className="py-2 pr-4">
-                      {formatMetricValue(year.completedDwellings)}
-                    </td>
+          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+            <h2 className="m-0 text-xl font-semibold">Årstabell</h2>
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[#ddd8cd] text-[#68746d]">
+                    <th className="py-2 pr-4 font-semibold">År</th>
+                    <th className="py-2 pr-4 font-semibold">Total</th>
+                    <th className="py-2 pr-4 font-semibold">Kommunal</th>
+                    <th className="py-2 pr-4 font-semibold">Selveid</th>
+                    <th className="py-2 pr-4 font-semibold">Privatleid</th>
+                    <th className="py-2 pr-4 font-semibold">
+                      Ikke-kommersiell
+                    </th>
+                    <th className="py-2 pr-4 font-semibold">Prisindeks</th>
+                    <th className="py-2 pr-4 font-semibold">Leiepress</th>
+                    <th className="py-2 pr-4 font-semibold">Igangsatt</th>
+                    <th className="py-2 pr-4 font-semibold">Ferdigstilt</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {years.map((year) => (
+                    <tr
+                      className="border-b border-[#eee8dd] last:border-0"
+                      key={year.year}
+                    >
+                      <td className="py-2 pr-4 font-semibold">{year.year}</td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(
+                          totalHousingStock(year.state.housingStock),
+                        )}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(year.state.housingStock.municipal)}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(
+                          year.state.housingStock.ownerOccupied,
+                        )}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(
+                          year.state.housingStock.privateRental,
+                        )}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(
+                          year.state.housingStock.nonCommercial,
+                        )}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(year.state.housingPriceIndex, 1)}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(year.privateRentalPressure, 2)}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(year.startedDwellings)}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {formatMetricValue(year.completedDwellings)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </section>
-      </section>
-    </div>
+      </div>
+    </>
   );
 }

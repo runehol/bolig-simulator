@@ -11,7 +11,7 @@ export function AppTabs({
     <nav aria-label="Hovedvisning" className="mb-8 border-b border-[#ddd8cd]">
       <div className="flex gap-2" role="tablist">
         {[
-          { id: "scenario" as const, label: "Simulator" },
+          { id: "scenario" as const, label: "Scenarioverksted" },
           { id: "historical" as const, label: "Historisk test" },
         ].map((tab) => (
           <button

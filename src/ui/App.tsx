@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-import { modelStart } from "../model/start-values";
 import {
   parseAppView,
   serializeAppViewSearch,
@@ -121,17 +120,9 @@ export function App() {
 
   return (
     <main className="min-h-screen px-4 py-8 sm:px-8 lg:px-12">
-      <header className="mb-8 max-w-5xl">
+      <header className="mb-6 max-w-5xl">
         <p className="mb-2 text-xs font-bold tracking-[0.08em] text-[#68746d] uppercase">
           Oslo boligsimulator
-        </p>
-        <h1 className="m-0 text-3xl leading-[1.1] tracking-normal sm:text-5xl">
-          Scenarioverksted
-        </h1>
-        <p className="mt-4 max-w-3xl text-base text-[#435048]">
-          Første modell kjører hele Oslo fra {modelStart.startYear} til{" "}
-          {modelStart.endYear}. Tallene er grove startverdier og skal brukes til
-          å teste modellstruktur.
         </p>
       </header>
 
