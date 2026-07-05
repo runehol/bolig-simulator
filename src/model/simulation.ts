@@ -150,8 +150,10 @@ export const simulateOneYear = (
     parameters.minStartShare,
     parameters.maxStartShare,
   );
-  const startedDwellings =
+  const modeledStartedDwellings =
     currentState.development.regulatedBacklog * startShare;
+  const startedDwellings =
+    inputs.exogenous.startedDwellingsOverride ?? modeledStartedDwellings;
   const completionYear =
     currentState.year + currentState.development.completionLagYears;
   const nonCommercialCompleted =

@@ -52,6 +52,7 @@ export type ExogenousInputs = {
   householdGrowthRate: number;
   constructionCostGrowth: number;
   regulatedNewCapacity: number;
+  startedDwellingsOverride?: number;
 };
 
 export type ScenarioInputs = {

@@ -235,7 +235,8 @@ Mål: begynne overgangen fra eksempelmodell til kildebasert modell.
       `docs/datakilder.md`.
 - [x] Skill modellinput fra evalueringsdata med observerte serier i
       `src/data/observed-oslo.ts`.
-- [ ] Lag et historisk scenario for 2015 til siste tilgjengelige år.
+- [x] Lag et historisk scenario for 2015 til siste tilgjengelige år med
+      observerte igangsettinger som første eksogene input.
 - [x] Velg et begrenset første kalibreringsmål:
 
   - total boligbestand

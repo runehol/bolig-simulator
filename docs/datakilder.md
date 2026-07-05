@@ -74,10 +74,24 @@ finmasket fordeling eller mange ekstra antakelser. Igangsettingstillatelser og
 kommunalt disponerte boliger brukes som støtteserier, men ikke som eneste mål
 for om modellkjernen treffer.
 
+## Første historiske scenario
+
+Første historiske scenario ligger i `src/model/historical-scenario.ts` og bruker
+observerte igangsettingstillatelser som eksogent input. Det betyr at backtesten
+foreløpig tester ferdigstillingspipeline og boligbestand, ikke om modellen
+klarer å forklare privat igangsetting fra pris, rente og kostnad.
+
+Dette er et bevisst første steg. Når pipeline og beholdningsregnskap er rimelig,
+kan vi senere slå av `startedDwellingsOverride` og la utbyggerresponsen forsøke
+å forklare historiske igangsettinger.
+
+Fordi første datagrunnlag starter i 2015 og modellen har to års
+byggetidsforsinkelse, mangler scenarioet foreløpig en oppvarmingsperiode for
+2013-2014. Ferdigstilte boliger i 2015 og 2016 er derfor ikke en rettferdig test
+før eldre igangsettingsdata eller eksplisitt initial
+`underConstruction`-beholdning legges inn.
+
 ## Åpne datavalg
 
 - Skal historisk husholdningsvekst mates fra faktisk befolkning/husholdninger,
   eller skal første backtest bruke en glattet vekstrate?
-- Skal byggeaktivitet i historisk scenario bruke faktiske igangsettinger som
-  input, eller skal modellen forsøke å forklare igangsettingene fra pris, rente
-  og kostnad?
