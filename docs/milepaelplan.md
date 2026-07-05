@@ -190,13 +190,14 @@ modell-snapshot.
 
 Mål: gjøre output lesbart uten at brukeren må forstå modellkoden.
 
-- [ ] Legg korte forklaringer på hvert outputmål.
-- [ ] Skill tydelig mellom Oslo-kommunale grep, statlige grep og eksterne
+- [x] Legg korte forklaringer på hvert outputmål.
+- [x] Skill tydelig mellom Oslo-kommunale grep, statlige grep og eksterne
       makroforutsetninger.
-- [ ] Innfør første grafbibliotek når tabellvisningen ikke lenger er nok.
-- [ ] Vis minst én tidsserie for kommunal eller ikke-kommersiell boligbestand.
-- [ ] Vis minst én indikator for leiepress eller boutgiftsbelastning.
-- [ ] Legg inn tekstlig usikkerhetsmerking for eksempeldata og ukalibrerte
+- [x] Vurder første grafbibliotek; ikke innfør det før behovet er tydeligere enn
+      i første SVG-graf.
+- [x] Vis minst én tidsserie for kommunal eller ikke-kommersiell boligbestand.
+- [x] Vis minst én indikator for leiepress eller boutgiftsbelastning.
+- [x] Legg inn tekstlig usikkerhetsmerking for eksempeldata og ukalibrerte
       regler.
 
 Ferdig når: første prototype kan brukes i en samtale om hva et scenario gjør,

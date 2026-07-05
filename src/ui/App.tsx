@@ -17,7 +17,7 @@ type ControlDefinition = {
   max: number;
   step: number;
   suffix: string;
-  group: "Kommunale grep" | "Eksterne forutsetninger";
+  group: "Oslo-kommunale grep" | "Eksterne makroforutsetninger";
 };
 
 type ScenarioFormState = ScenarioUrlState;
@@ -37,7 +37,7 @@ const controls: ControlDefinition[] = [
     max: 2000,
     step: 50,
     suffix: "boliger",
-    group: "Kommunale grep",
+    group: "Oslo-kommunale grep",
   },
   {
     id: "municipalSales",
@@ -46,7 +46,7 @@ const controls: ControlDefinition[] = [
     max: 1000,
     step: 50,
     suffix: "boliger",
-    group: "Kommunale grep",
+    group: "Oslo-kommunale grep",
   },
   {
     id: "nonCommercialShareOfNewBuild",
@@ -55,7 +55,7 @@ const controls: ControlDefinition[] = [
     max: 50,
     step: 1,
     suffix: "%",
-    group: "Kommunale grep",
+    group: "Oslo-kommunale grep",
   },
   {
     id: "interestRate",
@@ -64,7 +64,7 @@ const controls: ControlDefinition[] = [
     max: 8,
     step: 0.1,
     suffix: "%",
-    group: "Eksterne forutsetninger",
+    group: "Eksterne makroforutsetninger",
   },
   {
     id: "householdGrowthRate",
@@ -73,7 +73,7 @@ const controls: ControlDefinition[] = [
     max: 2,
     step: 0.1,
     suffix: "%",
-    group: "Eksterne forutsetninger",
+    group: "Eksterne makroforutsetninger",
   },
   {
     id: "constructionCostGrowth",
@@ -82,9 +82,26 @@ const controls: ControlDefinition[] = [
     max: 8,
     step: 0.1,
     suffix: "%",
-    group: "Eksterne forutsetninger",
+    group: "Eksterne makroforutsetninger",
   },
 ];
+
+const controlGroups = [
+  {
+    description: "Spaker kommunen kan endre direkte i denne første modellen.",
+    id: "Oslo-kommunale grep",
+  },
+  {
+    description:
+      "Ikke modellert som egne spaker ennå. Kommer senere der staten endrer rammer for skatt, Husbanken eller leieregulering.",
+    id: "Statlige grep",
+  },
+  {
+    description:
+      "Ytre forutsetninger som påvirker modellen, men ikke styres av Oslo kommune.",
+    id: "Eksterne makroforutsetninger",
+  },
+] as const;
 
 const initialFormState: ScenarioFormState = defaultScenarioUrlState;
 
@@ -394,6 +411,24 @@ function IndexedLineChart({
   );
 }
 
+function SummaryCard({
+  explanation,
+  label,
+  value,
+}: {
+  explanation: string;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-lg border border-[#ddd8cd] bg-white p-4">
+      <p className="m-0 text-sm text-[#68746d]">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
+      <p className="mt-3 text-sm leading-snug text-[#435048]">{explanation}</p>
+    </div>
+  );
+}
+
 export function App() {
   const [formState, setFormState] =
     useState<ScenarioFormState>(getInitialFormState);
@@ -462,61 +497,62 @@ export function App() {
             verdier.
           </p>
 
-          {(["Kommunale grep", "Eksterne forutsetninger"] as const).map(
-            (group) => (
-              <section className="mt-6" key={group}>
+          {controlGroups.map((group) => {
+            const groupControls = controls.filter(
+              (control) => control.group === group.id,
+            );
+
+            return (
+              <section className="mt-6" key={group.id}>
                 <h3 className="m-0 text-sm font-bold text-[#435048] uppercase">
-                  {group}
+                  {group.id}
                 </h3>
+                <p className="mt-1 text-sm leading-snug text-[#68746d]">
+                  {group.description}
+                </p>
                 <div className="mt-2">
-                  {controls
-                    .filter((control) => control.group === group)
-                    .map((control) => (
+                  {groupControls.length === 0 ? (
+                    <p className="m-0 rounded-md border border-dashed border-[#cfc7b8] bg-[#fbf8f1] p-3 text-sm text-[#68746d]">
+                      Ingen aktiv kontroll i første prototype.
+                    </p>
+                  ) : (
+                    groupControls.map((control) => (
                       <ScenarioControl
                         definition={control}
                         key={control.id}
                         onChange={updateFormValue}
                         value={formState[control.id]}
                       />
-                    ))}
+                    ))
+                  )}
                 </div>
               </section>
-            ),
-          )}
+            );
+          })}
         </aside>
 
         <section className="grid gap-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-lg border border-[#ddd8cd] bg-white p-4">
-              <p className="m-0 text-sm text-[#68746d]">Kommunale boliger</p>
-              <p className="mt-2 text-2xl font-semibold">
-                {formatMetricValue(firstYear.state.housingStock.municipal)}{" "}
-                {"->"}{" "}
-                {formatMetricValue(lastYear.state.housingStock.municipal)}
-              </p>
-            </div>
-            <div className="rounded-lg border border-[#ddd8cd] bg-white p-4">
-              <p className="m-0 text-sm text-[#68746d]">Ikke-kommersielle</p>
-              <p className="mt-2 text-2xl font-semibold">
-                {formatMetricValue(firstYear.state.housingStock.nonCommercial)}{" "}
-                {"->"}{" "}
-                {formatMetricValue(lastYear.state.housingStock.nonCommercial)}
-              </p>
-            </div>
-            <div className="rounded-lg border border-[#ddd8cd] bg-white p-4">
-              <p className="m-0 text-sm text-[#68746d]">Boligprisindeks</p>
-              <p className="mt-2 text-2xl font-semibold">
-                {formatMetricValue(firstYear.state.housingPriceIndex, 1)} {"->"}{" "}
-                {formatMetricValue(lastYear.state.housingPriceIndex, 1)}
-              </p>
-            </div>
-            <div className="rounded-lg border border-[#ddd8cd] bg-white p-4">
-              <p className="m-0 text-sm text-[#68746d]">Privat leiepress</p>
-              <p className="mt-2 text-2xl font-semibold">
-                {formatMetricValue(firstYear.privateRentalPressure, 2)} {"->"}{" "}
-                {formatMetricValue(lastYear.privateRentalPressure, 2)}
-              </p>
-            </div>
+            <SummaryCard
+              explanation="Kommunalt disponerte boliger etter kjøp, salg og modellert beholdningsendring."
+              label="Kommunale boliger"
+              value={`${formatMetricValue(firstYear.state.housingStock.municipal)} -> ${formatMetricValue(lastYear.state.housingStock.municipal)}`}
+            />
+            <SummaryCard
+              explanation="Boliger utenfor ordinær kommersiell eier- og leiemodell, bygget opp gjennom nybyggandelen."
+              label="Ikke-kommersielle"
+              value={`${formatMetricValue(firstYear.state.housingStock.nonCommercial)} -> ${formatMetricValue(lastYear.state.housingStock.nonCommercial)}`}
+            />
+            <SummaryCard
+              explanation="Modellert prisnivå der 100 er startnivået. Brukes foreløpig som driver for privat bygging."
+              label="Boligprisindeks"
+              value={`${formatMetricValue(firstYear.state.housingPriceIndex, 1)} -> ${formatMetricValue(lastYear.state.housingPriceIndex, 1)}`}
+            />
+            <SummaryCard
+              explanation="Indikator for press i privat leiemarked. Høyere verdi betyr strammere marked i modellen."
+              label="Privat leiepress"
+              value={`${formatMetricValue(firstYear.privateRentalPressure, 2)} -> ${formatMetricValue(lastYear.privateRentalPressure, 2)}`}
+            />
           </div>
 
           <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
@@ -536,6 +572,16 @@ export function App() {
             </div>
 
             <IndexedLineChart series={chartSeries} years={chartYears} />
+            <div className="mt-4 grid gap-3 border-t border-[#eee8dd] pt-4 text-sm leading-snug text-[#435048] md:grid-cols-2">
+              <p className="m-0">
+                Grafen viser relativ utvikling, ikke nivå. Alle serier starter
+                på 100 for å gjøre retning og tempo sammenlignbart.
+              </p>
+              <p className="m-0">
+                Første prototype bruker grove startverdier og ukalibrerte
+                regler. Tabellen under viser de faktiske modellverdiene.
+              </p>
+            </div>
           </section>
 
           <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">

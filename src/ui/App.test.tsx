@@ -23,6 +23,17 @@ describe("App", () => {
     expect(
       screen.getByRole("columnheader", { name: "Kommunal" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("Oslo-kommunale grep")).toBeInTheDocument();
+    expect(screen.getByText("Statlige grep")).toBeInTheDocument();
+    expect(
+      screen.getByText("Eksterne makroforutsetninger"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Kommunalt disponerte boliger/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Grafen viser relativ utvikling/),
+    ).toBeInTheDocument();
   });
 
   it("updates municipal stock when purchases change", async () => {
