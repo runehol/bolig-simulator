@@ -7,6 +7,8 @@ Dette repoet er en Vite/React/TypeScript/Tailwind-app for Oslo boligsimulator.
 
 - Sjekk arbeidskopien med `git status --short`.
 - Les filene du faktisk skal endre, og relevant del av designnotatet.
+- Kjør `gh`-kommandoer med forhøyede rettigheter, slik at GitHub-autentisering
+  virker.
 - Bevar GitHub Pages-oppsettet i `vite.config.ts`, særlig
   `base: "/bolig-simulator/"`.
 
