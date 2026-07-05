@@ -28,38 +28,47 @@ designnotatet.
 
 Mål: lukke de viktigste valgene før modellkoden blir for bred.
 
-- [ ] Velg om første kjørbare modell skal starte i 2015, 2027 eller støtte begge
-      gjennom samme scenarioformat.
-- [ ] Bekreft første politiske spaker:
+- [x] Velg første kjørbare modellperiode:
+
+  - 2027 til 2040 for framtidsscenario
+  - 2015 holdes tilbake til historisk backtest
+
+- [x] Velg første modellgeografi:
+
+  - hele Oslo som én enhet
+  - bydel, delbydel og grunnkrets holdes tilbake til senere dataløp
+
+- [x] Bekreft første politiske spaker:
 
   - kommunale boligkjøp per år
   - kommunale boligsalg per år
   - ikke-kommersiell andel av nybygg
 
-- [ ] Bekreft første eksterne spaker:
+- [x] Bekreft første eksterne spaker:
 
   - rente
   - befolkningsvekst
   - byggekostnad
 
-- [ ] Bekreft at første framtidsmodell skal beregne ferdigstilte boliger gjennom
+- [x] Bekreft at første framtidsmodell skal beregne ferdigstilte boliger gjennom
       en enkel privat utbyggingsrespons.
-- [ ] Avklar startverdier for boligprisindeks, regulert backlog, igangsatte
+- [x] Skill grove startverdier ut i eget dokument: `docs/model-startverdier.md`.
+- [x] Avklar startverdier for boligprisindeks, regulert backlog, igangsatte
       boliger og byggetidsforsinkelse.
-- [ ] Bekreft første husholdningsgrupper:
+- [x] Bekreft første husholdningsgrupper:
 
   - `lowIncomeRenters`
   - `otherRenters`
   - `ownerHouseholds`
 
-- [ ] Bekreft første disposisjonsformer for boligbestand:
+- [x] Bekreft første disposisjonsformer for boligbestand:
 
   - `ownerOccupied`
   - `privateRental`
   - `municipal`
   - `nonCommercial`
 
-- [ ] Velg første outputsett for UI:
+- [x] Velg første outputsett for UI:
 
   - kommunal boligbestand
   - ikke-kommersiell boligbestand
@@ -68,7 +77,7 @@ Mål: lukke de viktigste valgene før modellkoden blir for bred.
   - igangsatte og ferdigstilte boliger
   - husholdninger med høy boutgiftsbelastning
 
-- [ ] Skriv ned hvilke tall som er grove startverdier, og hvilke som må komme
+- [x] Skriv ned hvilke tall som er grove startverdier, og hvilke som må komme
       fra kilder før modellen kan brukes offentlig.
 
 Ferdig når: første modellgrense er konkret nok til at TypeScript-typer og

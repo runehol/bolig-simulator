@@ -1090,10 +1090,11 @@ Første tekniske prototype bør være:
 - deploy til GitHub Pages
 - én simuleringsmotor uten backend
 - scenarioer serialisert i URL
-- hele Oslo som første visning, men med geografimodell som kan støtte
-  delbydel/gammel bydel/ny bydel
+- hele Oslo som første modellgeografi og første visning, men med typer som ikke
+  blokkerer senere delbydel/gammel bydel/ny bydel
 - årlige tidssteg
-- startår 2015 eller 2027, valgt i UI
+- startår 2027 og sluttår 2040 for første framtidsscenario
+- 2015 holdes tilbake til historisk backtest
 - tre politiske spaker: kommunale kjøp, kommunale salg og ikke-kommersiell andel
   av nybygg
 - tre eksterne spaker: rente, befolkningsvekst og byggekostnad
@@ -1104,6 +1105,10 @@ Første tekniske prototype bør være:
 - output: kommunal boligbestand, privat leiepress, ikke-kommersiell
   boligbestand, igangsatte/ferdigstilte boliger og husholdninger med høy
   boutgiftsbelastning
+
+Grove, utskiftbare startverdier for denne første modellen ligger i
+`docs/model-startverdier.md`. Tallene skal brukes for å teste modellstruktur, og
+skal ikke behandles som ferdig kalibrerte verdier for offentlig bruk.
 
 Når dette virker, kan modellen deles opp etter bydel og historisk backtest
 bygges inn.
