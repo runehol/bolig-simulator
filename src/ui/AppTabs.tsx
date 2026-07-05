@@ -8,7 +8,10 @@ export function AppTabs({
   onChange: (view: AppView) => void;
 }) {
   return (
-    <nav aria-label="Hovedvisning" className="mb-8 border-b border-[#ddd8cd]">
+    <nav
+      aria-label="Hovedvisning"
+      className="mb-8 border-b border-[#ddd8cd] dark:border-[#3b4438]"
+    >
       <div className="flex gap-2" role="tablist">
         {[
           { id: "scenario" as const, label: "Scenarioverksted" },
@@ -18,8 +21,8 @@ export function AppTabs({
             aria-selected={activeView === tab.id}
             className={`border-b-2 px-4 py-3 text-sm font-semibold ${
               activeView === tab.id
-                ? "border-[#b13f2d] text-[#17211c]"
-                : "border-transparent text-[#68746d]"
+                ? "border-[#b13f2d] text-[#17211c] dark:border-[#d8664f] dark:text-[#eef2e9]"
+                : "border-transparent text-[#68746d] dark:text-[#a8b2a8]"
             }`}
             key={tab.id}
             onClick={() => onChange(tab.id)}

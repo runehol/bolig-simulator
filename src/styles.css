@@ -16,6 +16,13 @@
   text-rendering: optimizeLegibility;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #eef2e9;
+    background: #111510;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

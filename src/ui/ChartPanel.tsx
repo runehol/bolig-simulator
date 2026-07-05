@@ -25,13 +25,15 @@ export function ChartPanel({
   years,
 }: ChartPanelProps) {
   return (
-    <section className="min-w-0 max-w-full rounded-lg border border-[#ddd8cd] bg-white p-5">
+    <section className="min-w-0 max-w-full rounded-lg border border-[#ddd8cd] bg-white p-5 dark:border-[#3b4438] dark:bg-[#1a201a]">
       <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           <h2 className="m-0 text-xl font-semibold">{title}</h2>
-          <div className="m-0 mt-1 text-sm text-[#68746d]">{children}</div>
+          <div className="m-0 mt-1 text-sm text-[#68746d] dark:text-[#a8b2a8]">
+            {children}
+          </div>
         </div>
-        <p className="m-0 text-sm font-semibold text-[#435048]">
+        <p className="m-0 text-sm font-semibold text-[#435048] dark:text-[#c7d0c3]">
           {periodLabel}
         </p>
       </div>
@@ -43,7 +45,7 @@ export function ChartPanel({
         valueFloor={valueFloor}
         years={years}
       />
-      <div className="mt-4 grid gap-2 border-t border-[#eee8dd] pt-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid gap-2 border-t border-[#eee8dd] pt-4 dark:border-[#30382f] sm:grid-cols-2 lg:grid-cols-3">
         {series.map((item) => {
           const finalValue = item.values[item.values.length - 1] ?? 0;
 
@@ -54,8 +56,10 @@ export function ChartPanel({
                 className="h-2.5 w-5 rounded-full"
                 style={{ backgroundColor: item.color }}
               />
-              <span className="text-[#435048]">{item.label}</span>
-              <span className="ml-auto font-semibold text-[#17211c]">
+              <span className="text-[#435048] dark:text-[#c7d0c3]">
+                {item.label}
+              </span>
+              <span className="ml-auto font-semibold text-[#17211c] dark:text-[#eef2e9]">
                 {formatMetricValue(finalValue, item.decimals ?? 0)}
                 {item.unit === undefined ? "" : ` ${item.unit}`}
               </span>

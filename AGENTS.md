@@ -20,6 +20,8 @@ Dette repoet er en Vite/React/TypeScript/Tailwind-app for Oslo boligsimulator.
 - Scenario-URL-logikk hører hjemme under `src/routing/` når den innføres.
 - UI-kode hører hjemme under `src/ui/`.
 - Bruk Tailwind utility-klasser som standard for layout og komponentstil.
+- UI-endringer skal fungere i både light og dark mode. Bruk `dark:`-prefikser
+  når komponenter har eksplisitte farger.
 - Behold `src/styles.css` til Tailwind-import og global basestil.
 
 ## Tester

@@ -127,7 +127,7 @@ export function HistoricalBacktestView() {
         <h1 className="m-0 text-3xl leading-[1.1] tracking-normal sm:text-5xl">
           Historisk test
         </h1>
-        <p className="mt-4 max-w-3xl text-base text-[#435048]">
+        <p className="mt-4 max-w-3xl text-base text-[#435048] dark:text-[#c7d0c3]">
           Første backtest kjører modellen for {periodLabel} med observerte
           igangsettinger og historisk styringsrente. Den tester foreløpig
           pipeline, ferdigstillelser og boligbestand før vi kalibrerer
@@ -202,12 +202,12 @@ export function HistoricalBacktestView() {
         backtesten.
       </ChartPanel>
 
-      <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+      <section className="rounded-lg border border-[#ddd8cd] bg-white p-5 dark:border-[#3b4438] dark:bg-[#1a201a]">
         <h2 className="m-0 text-xl font-semibold">Avvikstabell</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[760px] border-collapse text-left text-sm">
             <thead>
-              <tr className="border-b border-[#ddd8cd] text-[#68746d]">
+              <tr className="border-b border-[#ddd8cd] text-[#68746d] dark:border-[#3b4438] dark:text-[#a8b2a8]">
                 <th className="py-2 pr-4 font-semibold">År</th>
                 <th className="py-2 pr-4 font-semibold">Modellert bestand</th>
                 <th className="py-2 pr-4 font-semibold">Observert bestand</th>
@@ -224,7 +224,7 @@ export function HistoricalBacktestView() {
             <tbody>
               {comparisonRows.map((row) => (
                 <tr
-                  className="border-b border-[#eee8dd] last:border-0"
+                  className="border-b border-[#eee8dd] last:border-0 dark:border-[#30382f]"
                   key={row.year}
                 >
                   <td className="py-2 pr-4 font-semibold">{row.year}</td>

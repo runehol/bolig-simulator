@@ -176,20 +176,22 @@ function ScenarioControl({
   }, [value]);
 
   return (
-    <div className="grid gap-2 border-b border-[#e5dfd2] py-4 last:border-0">
+    <div className="grid gap-2 border-b border-[#e5dfd2] py-4 last:border-0 dark:border-[#30382f]">
       <div className="flex items-baseline justify-between gap-3">
         <label
-          className="text-sm font-semibold text-[#1e2a23]"
+          className="text-sm font-semibold text-[#1e2a23] dark:text-[#f7f8f2]"
           htmlFor={inputId}
         >
           {definition.label}
         </label>
-        <span className="text-xs text-[#68746d]">{definition.suffix}</span>
+        <span className="text-xs text-[#68746d] dark:text-[#a8b2a8]">
+          {definition.suffix}
+        </span>
       </div>
       <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_6.5rem]">
         <input
           aria-label={`${definition.label} slider`}
-          className="h-2 w-full cursor-pointer accent-[#b13f2d]"
+          className="h-2 w-full cursor-pointer accent-[#b13f2d] dark:accent-[#d8664f]"
           max={definition.max}
           min={definition.min}
           onChange={(event) =>
@@ -201,7 +203,7 @@ function ScenarioControl({
         />
         <input
           aria-label={definition.label}
-          className="h-10 w-full max-w-[8rem] rounded-md border border-[#cfc7b8] bg-white px-2 text-right text-sm text-[#17211c] sm:max-w-none"
+          className="h-10 w-full max-w-[8rem] rounded-md border border-[#cfc7b8] bg-white px-2 text-right text-sm text-[#17211c] dark:border-[#586252] dark:bg-[#111510] dark:text-[#eef2e9] sm:max-w-none"
           id={inputId}
           max={definition.max}
           min={definition.min}
@@ -215,7 +217,7 @@ function ScenarioControl({
           value={draftValue}
         />
       </div>
-      <p className="m-0 text-sm text-[#68746d]">
+      <p className="m-0 text-sm text-[#68746d] dark:text-[#a8b2a8]">
         {formatControlValue(value, definition)} {definition.suffix}
       </p>
     </div>
@@ -252,7 +254,7 @@ export function ScenarioWorkshopView({
         <h1 className="m-0 text-3xl leading-[1.1] tracking-normal sm:text-5xl">
           Scenarioverksted
         </h1>
-        <p className="mt-4 max-w-3xl text-base text-[#435048]">
+        <p className="mt-4 max-w-3xl text-base text-[#435048] dark:text-[#c7d0c3]">
           Første modell kjører hele Oslo fra {modelStart.startYear} til{" "}
           {modelStart.endYear}. Tallene er grove startverdier og skal brukes til
           å teste modellstruktur.
@@ -260,9 +262,9 @@ export function ScenarioWorkshopView({
       </header>
 
       <div className="grid gap-6 xl:grid-cols-[23rem_1fr]">
-        <aside className="w-full max-w-[32rem] self-start rounded-lg border border-[#ddd8cd] bg-white p-5 xl:max-w-none">
+        <aside className="w-full max-w-[32rem] self-start rounded-lg border border-[#ddd8cd] bg-white p-5 dark:border-[#3b4438] dark:bg-[#1a201a] xl:max-w-none">
           <h2 className="m-0 text-xl font-semibold">Scenario</h2>
-          <p className="mt-2 text-sm text-[#68746d]">
+          <p className="mt-2 text-sm text-[#68746d] dark:text-[#a8b2a8]">
             Slidere gir rask utforsking. Nummerfeltene kan brukes for presise
             verdier.
           </p>
@@ -274,15 +276,15 @@ export function ScenarioWorkshopView({
 
             return (
               <section className="mt-6" key={group.id}>
-                <h3 className="m-0 text-sm font-bold text-[#435048] uppercase">
+                <h3 className="m-0 text-sm font-bold text-[#435048] uppercase dark:text-[#c7d0c3]">
                   {group.id}
                 </h3>
-                <p className="mt-1 text-sm leading-snug text-[#68746d]">
+                <p className="mt-1 text-sm leading-snug text-[#68746d] dark:text-[#a8b2a8]">
                   {group.description}
                 </p>
                 <div className="mt-2">
                   {groupControls.length === 0 ? (
-                    <p className="m-0 rounded-md border border-dashed border-[#cfc7b8] bg-[#fbf8f1] p-3 text-sm text-[#68746d]">
+                    <p className="m-0 rounded-md border border-dashed border-[#cfc7b8] bg-[#fbf8f1] p-3 text-sm text-[#68746d] dark:border-[#586252] dark:bg-[#22291f] dark:text-[#a8b2a8]">
                       Ingen aktiv kontroll i første prototype.
                     </p>
                   ) : (
@@ -360,8 +362,8 @@ export function ScenarioWorkshopView({
             Faktiske årlige strømmer for igangsatte og ferdigstilte boliger.
           </ChartPanel>
 
-          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
-            <div className="grid gap-3 text-sm leading-snug text-[#435048] md:grid-cols-2">
+          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5 dark:border-[#3b4438] dark:bg-[#1a201a]">
+            <div className="grid gap-3 text-sm leading-snug text-[#435048] dark:text-[#c7d0c3] md:grid-cols-2">
               <p className="m-0">
                 Indikatorer vises som indeks for å gjøre utviklingen
                 sammenlignbar. Boligbestand og boligendringer vises som faktiske
@@ -374,12 +376,12 @@ export function ScenarioWorkshopView({
             </div>
           </section>
 
-          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5 dark:border-[#3b4438] dark:bg-[#1a201a]">
             <h2 className="m-0 text-xl font-semibold">Årstabell</h2>
             <div className="mt-4 overflow-x-auto">
               <table className="w-full min-w-[760px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[#ddd8cd] text-[#68746d]">
+                  <tr className="border-b border-[#ddd8cd] text-[#68746d] dark:border-[#3b4438] dark:text-[#a8b2a8]">
                     <th className="py-2 pr-4 font-semibold">År</th>
                     <th className="py-2 pr-4 font-semibold">Total</th>
                     <th className="py-2 pr-4 font-semibold">Kommunal</th>
@@ -397,7 +399,7 @@ export function ScenarioWorkshopView({
                 <tbody>
                   {years.map((year) => (
                     <tr
-                      className="border-b border-[#eee8dd] last:border-0"
+                      className="border-b border-[#eee8dd] last:border-0 dark:border-[#30382f]"
                       key={year.year}
                     >
                       <td className="py-2 pr-4 font-semibold">{year.year}</td>

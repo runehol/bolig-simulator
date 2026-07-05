@@ -119,9 +119,9 @@ export function App() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-8 sm:px-8 lg:px-12">
+    <main className="min-h-screen bg-[#f7f6f1] px-4 py-8 text-[#17211c] dark:bg-[#111510] dark:text-[#eef2e9] sm:px-8 lg:px-12">
       <header className="mb-6 max-w-5xl">
-        <p className="mb-2 text-xs font-bold tracking-[0.08em] text-[#68746d] uppercase">
+        <p className="mb-2 text-xs font-bold tracking-[0.08em] text-[#68746d] uppercase dark:text-[#a8b2a8]">
           Oslo boligsimulator
         </p>
       </header>
