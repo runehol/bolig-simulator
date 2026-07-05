@@ -1,0 +1,221 @@
+# Oslo boligsimulator: milepælplan
+
+Arbeidsplan for å gå fra Vite/React-skjelett til en første brukbar boligpolitisk
+simulator. Produkt- og modellretningen ligger i
+`docs/oslo-boligsimulator-design.md`; dette dokumentet beskriver rekkefølge,
+avgrensning og ferdigkriterier.
+
+Planen skal være levende, men bør ikke samle alle modellresonnementer. Når en
+modellbeslutning endrer selve produkt- eller modellretningen, hører den hjemme i
+designnotatet.
+
+## Førende prinsipper
+
+- Første versjon skal være pedagogisk og politisk lesbar før den forsøker å være
+  en fullverdig prognosemodell.
+- Simuleringslogikk skal ligge i `src/model/`, ikke i React-komponenter.
+- Alle scenarioverdier skal være tidslinjer internt, selv når UI-et viser en
+  enkel kontroll.
+- Samme scenario og samme modellversjon skal gi samme output.
+- Delbare URL-er skal representere scenario-input, ikke skjult
+  applikasjonstilstand.
+- Hele Oslo kan brukes som første modellgeografi, men typene bør ikke blokkere
+  senere bydel, delbydel eller ny bydelsstruktur.
+- Usikkerhet, grove antakelser og ikke-kalibrerte regler skal være synlige i UI.
+- Backtest skal bygges inn før modellen brukes som argument for historisk treff.
+
+## Milepæl 0: Avklar første modellgrense
+
+Mål: lukke de viktigste valgene før modellkoden blir for bred.
+
+- [ ] Velg om første kjørbare modell skal starte i 2015, 2027 eller støtte begge
+      gjennom samme scenarioformat.
+- [ ] Bekreft første politiske spaker:
+
+  - kommunale boligkjøp per år
+  - kommunale boligsalg per år
+  - ikke-kommersiell andel av nybygg
+
+- [ ] Bekreft første eksterne spaker:
+
+  - rente
+  - befolkningsvekst
+  - byggekostnad
+
+- [ ] Avklar om første modell skal ha privat utbyggingsrespons fra starten,
+      eller om ferdigstilte boliger midlertidig kan være eksogen input.
+- [ ] Velg første outputsett for UI:
+
+  - kommunal boligbestand
+  - ikke-kommersiell boligbestand
+  - privat leiepress
+  - igangsatte og ferdigstilte boliger
+  - husholdninger med høy boutgiftsbelastning
+
+- [ ] Skriv ned hvilke tall som er grove startverdier, og hvilke som må komme
+      fra kilder før modellen kan brukes offentlig.
+
+Ferdig når: første modellgrense er konkret nok til at TypeScript-typer og
+deterministiske enhetstester kan skrives uten å gjette på produktretning.
+
+## Milepæl 1: Modelltyper og deterministisk simulering
+
+Mål: etablere en ren modellkjerne uten UI-avhengigheter.
+
+- [ ] Opprett `src/model/`.
+- [ ] Definer grunnleggende typer for år, scenario, eksterne input, politiske
+      input, modelltilstand og output.
+- [ ] Lag en starttilstand for hele Oslo med tydelig merkede eksempelverdier.
+- [ ] Implementer en enkel årlig simuleringsløkke.
+- [ ] La politiske input og eksterne input ekspanderes til komplett tidslinje.
+- [ ] Implementer kommunale kjøp og salg som stock-flow-regler.
+- [ ] Implementer ikke-kommersiell andel av nybygg som egen beholdningsregel.
+- [ ] Implementer en første leiepressindikator.
+- [ ] Legg til enhetstester for:
+
+  - stabil gjentakbarhet
+  - kommunale kjøp øker kommunal boligbestand
+  - kommunale salg reduserer kommunal boligbestand
+  - ikke-kommersiell nybyggandel øker ikke-kommersiell beholdning
+  - høyere etterspørsel eller lavere privat leietilbud øker leiepress
+
+Ferdig når: `npm run test:run` dekker modellkjernen, og samme scenario gir samme
+output uten React.
+
+## Milepæl 2: Første scenario-UI
+
+Mål: gjøre modellkjernen synlig og justerbar i appen.
+
+- [ ] Erstatt scaffold-visningen med et enkelt scenarioverksted.
+- [ ] Legg kontrollere for de første politiske spakene.
+- [ ] Legg kontrollere for de første eksterne spakene.
+- [ ] Vis valgt startår, sluttår og modellversjon.
+- [ ] Vis modelloutput som en kompakt tabell eller enkel tidslinjevisning.
+- [ ] Merk eksempeldata og grove antakelser tydelig i brukerflaten.
+- [ ] Legg til komponenttester for brukerobserverbar oppførsel:
+
+  - endring i kjøp oppdaterer output
+  - endring i salg oppdaterer output
+  - endring i ikke-kommersiell andel oppdaterer output
+
+Ferdig når: en bruker kan endre scenario i nettleseren og se at relevante
+outputmål endrer seg på en forklarbar måte.
+
+## Milepæl 3: Delbare scenarioer
+
+Mål: gjøre enkle scenarioer stabile og delbare via URL.
+
+- [ ] Opprett `src/routing/`.
+- [ ] Definer korte URL-parametre for første enkle modus.
+- [ ] Implementer parsing fra URL til scenario-input.
+- [ ] Implementer serialisering fra scenario-input til URL.
+- [ ] Bevar ukjente eller ugyldige verdier på en ryddig måte:
+
+  - ugyldige tall faller tilbake til standardverdi
+  - gamle eller manglende parametre gir et gyldig standardsenario
+
+- [ ] Legg til tester for URL-rundtur:
+
+  - scenario til URL til scenario
+  - manglende parametre
+  - ugyldige parametre
+
+Ferdig når: to brukere kan åpne samme URL og få samme scenario og samme
+modelloutput.
+
+## Milepæl 4: Forklaringer og første grafvisning
+
+Mål: gjøre output lesbart uten at brukeren må forstå modellkoden.
+
+- [ ] Legg korte forklaringer på hvert outputmål.
+- [ ] Skill tydelig mellom Oslo-kommunale grep, statlige grep og eksterne
+      makroforutsetninger.
+- [ ] Innfør første grafbibliotek når tabellvisningen ikke lenger er nok.
+- [ ] Vis minst én tidsserie for kommunal eller ikke-kommersiell boligbestand.
+- [ ] Vis minst én indikator for leiepress eller boutgiftsbelastning.
+- [ ] Legg inn tekstlig usikkerhetsmerking for eksempeldata og ukalibrerte
+      regler.
+
+Ferdig når: første prototype kan brukes i en samtale om hva et scenario gjør,
+ikke bare som teknisk demonstrasjon.
+
+## Milepæl 5: Datagrunnlag og første backtest
+
+Mål: begynne overgangen fra eksempelmodell til kildebasert modell.
+
+- [ ] Kartlegg første åpne datakilder for:
+
+  - befolkning og husholdninger
+  - boligbestand
+  - kommunal boligbestand
+  - boligbygging
+  - rente
+  - byggekostnad eller relevant kostnadsindeks
+
+- [ ] Dokumenter tabellnummer, API-spørringer eller filkilder der data hentes.
+- [ ] Skill modellinput fra evalueringsdata.
+- [ ] Lag et historisk scenario for 2015 til siste tilgjengelige år.
+- [ ] Velg et begrenset første kalibreringsmål.
+- [ ] Vis historisk output mot observert serie for minst ett mål.
+
+Ferdig når: repoet kan kjøre en enkel historisk sammenligning uten at modellen
+mates med akkurat den serien den skal evalueres mot.
+
+## Milepæl 6: Geografi og fordelingsspørsmål
+
+Mål: forberede overgang fra hele Oslo til geografisk modellering.
+
+- [ ] Avklar første interne geografinivå:
+
+  - hele Oslo
+  - bydel
+  - delbydel
+  - grunnkrets
+  - annen stabil sone
+
+- [ ] Kartlegg koblinger mellom gammel bydel, ny bydel og lavere geografi.
+- [ ] Definer metadata for geografiversjon.
+- [ ] Definer metadata for datakvalitet og fordelingsmetode.
+- [ ] Bestem hvilke variabler som aldri bør fordeles ned med enkel
+      folketallsnøkkel.
+- [ ] Lag en første rapporteringsvisning som kan aggregere modelloutput.
+
+Ferdig når: geografisk modellering kan innføres uten å hardkode dagens
+bydelsstruktur som modellens egentlige nøkkel.
+
+## Milepæl 7: Offentlig førsteversjon
+
+Mål: gjøre en liten, ærlig og delbar versjon klar for ekstern testing.
+
+- [ ] Fullfør enkel modus.
+- [ ] Sørg for at alle synlige outputmål har forklaring.
+- [ ] Sørg for at eksempeldata, usikre antakelser og modellversjon vises.
+- [ ] Kjør `npm run check`.
+- [ ] Kontroller at GitHub Pages-oppsettet fortsatt bruker
+      `base: "/bolig-simulator/"`.
+- [ ] Oppdater README med faktisk appstruktur, kommandoer og begrensninger.
+- [ ] Publiser via eksisterende GitHub Pages-flyt.
+
+Ferdig når: lenken kan deles med folk som ikke kjenner kodebasen, og de kan
+forstå både hva simulatoren viser og hva den foreløpig ikke kan brukes til.
+
+## Utsatt med vilje
+
+Disse temaene er viktige, men bør ikke styre første modellkjerne:
+
+- full agentbasert modell
+- brukerkontoer eller serverlagret scenarioarkiv
+- avansert komprimert scenarioformat
+- Web Worker før simuleringen faktisk blir tung
+- MapLibre-kart før geografimodellen og datagrunnlaget er avklart
+- deck.gl eller tunge WebGL-lag
+- finmasket husholdningsmodell med mange grupper
+- presis boligprisprognose som hovedoutput
+- full modellering av sekundærboliger og korttidsutleie
+
+## Nærmeste anbefalte arbeid
+
+Start med milepæl 0 og 1. Den viktigste første avklaringen er om framtidig
+nybygging skal beregnes med en enkel privat utbyggingsrespons fra starten, eller
+om første tekniske modell midlertidig skal bruke ferdigstilte boliger som
+eksogen input.
