@@ -20,9 +20,25 @@ kopier hele planen inn i kode eller dokumentasjon.
 - Modellkode hører hjemme under `src/model/` når den innføres.
 - Scenario-URL-logikk hører hjemme under `src/routing/` når den innføres.
 - UI-kode hører hjemme under `src/ui/`.
+- Legg tester nær koden de dekker når det er praktisk, for eksempel
+  `src/ui/App.test.tsx` for UI-komponenter.
+- Bruk `src/test/setup.ts` for felles testoppsett som skal gjelde alle
+  Vitest-tester.
 - Ikke legg til nye runtime-avhengigheter uten konkret behov i implementert
   kode.
 - Ikke opprett tomme katalogstrukturer bare for å speile designnotatet.
+
+## Tester
+
+- Bruk Vitest som testkjører.
+- Bruk React Testing Library for komponenttester av React-UI.
+- Bruk `@testing-library/jest-dom`-matchere via `src/test/setup.ts`.
+- Kjør `npm run test` for watch-modus under utvikling.
+- Kjør `npm run test:run` for en engangskjøring av testene.
+- Nye modellfunksjoner bør ha deterministiske enhetstester som dekker
+  scenario-input og forventet output.
+- Nye UI-flyter bør ha komponenttester som tester brukerobserverbar oppførsel,
+  ikke interne React-detaljer.
 
 ## Formatering
 
@@ -34,8 +50,7 @@ kopier hele planen inn i kode eller dokumentasjon.
   - Semikolon der eksisterende TypeScript-kode bruker det.
   - CSS med én regel per blokk og lesbare linjeskift.
 - I Markdown-filer skal linjer brekkes rundt 80 tegn der det er praktisk.
-- `docs/` er foreløpig ignorert av Prettier for å unngå store mekaniske
-  endringer i designnotatet.
+- Prettier gjelder også Markdown i `docs/`.
 
 ## Kvalitetssjekker
 
@@ -49,6 +64,7 @@ npm run check
   Vitest.
 - `npm run lint` kan brukes alene for ESLint-regler.
 - `npm run build` kan brukes alene for TypeScript-prosjektbygg og Vite-build.
+- `npm run test:run` kan brukes alene for Vitest-testene.
 - Hvis du bare endrer Markdown eller ren tekst, holder det vanligvis å sjekke
   diffen og linjelengde.
 - Hvis en sjekk ikke kan kjøres, oppgi konkret kommando og feilmelding.
