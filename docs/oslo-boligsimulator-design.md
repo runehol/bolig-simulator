@@ -229,7 +229,7 @@ src/
     initial-state.ts
     flows.ts
     policies.ts
-    simulate.ts
+    simulation.ts
     calibration.ts
   data/
     historical/

@@ -50,11 +50,13 @@ npm run format
 
 ```text
 src/
+  model/       simuleringslogikk, startverdier og modelltester
   test/        felles testoppsett
   ui/          React-komponenter
   main.tsx     React-entrypoint
   styles.css   Tailwind-import og global basestil
 ```
 
-Når modellen legges til, bør simuleringslogikken ligge i `src/model`, ikke i
-React-komponentene.
+Simuleringslogikken ligger i `src/model`, ikke i React-komponentene. Første
+modellkjerne kjører hele Oslo som én enhet fra 2027 til 2040 med grove,
+utskiftbare startverdier fra `src/model/start-values.ts`.

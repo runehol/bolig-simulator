@@ -87,25 +87,25 @@ deterministiske enhetstester kan skrives uten å gjette på produktretning.
 
 Mål: etablere en ren modellkjerne uten UI-avhengigheter.
 
-- [ ] Opprett `src/model/`.
-- [ ] Definer grunnleggende typer for år, scenario, eksterne input, politiske
+- [x] Opprett `src/model/`.
+- [x] Definer grunnleggende typer for år, scenario, eksterne input, politiske
       input, modelltilstand og output.
-- [ ] Lag en starttilstand for hele Oslo med tydelig merkede eksempelverdier.
-- [ ] Implementer en enkel årlig simuleringsløkke.
-- [ ] La politiske input og eksterne input ekspanderes til komplett tidslinje.
-- [ ] Implementer en enkel modellert boligprisindeks som mellomvariabel.
-- [ ] Implementer regulert backlog, igangsatte boliger, boliger under bygging og
+- [x] Lag en starttilstand for hele Oslo med tydelig merkede eksempelverdier.
+- [x] Implementer en enkel årlig simuleringsløkke.
+- [x] La politiske input og eksterne input ekspanderes til komplett tidslinje.
+- [x] Implementer en enkel modellert boligprisindeks som mellomvariabel.
+- [x] Implementer regulert backlog, igangsatte boliger, boliger under bygging og
       ferdigstilte boliger som egen pipeline.
-- [ ] Implementer privat igangsetting som respons på boligprisindeks,
+- [x] Implementer privat igangsetting som respons på boligprisindeks,
       byggekostnad, rente, ikke-kommersielt krav og regulert kapasitet.
-- [ ] Implementer første husholdningsgrupper som enkel modelltilstand:
+- [x] Implementer første husholdningsgrupper som enkel modelltilstand:
       `lowIncomeRenters`, `otherRenters` og `ownerHouseholds`.
-- [ ] Implementer boligbestand etter disposisjonsform: `ownerOccupied`,
+- [x] Implementer boligbestand etter disposisjonsform: `ownerOccupied`,
       `privateRental`, `municipal` og `nonCommercial`.
-- [ ] Implementer kommunale kjøp og salg som stock-flow-regler.
-- [ ] Implementer ikke-kommersiell andel av nybygg som egen beholdningsregel.
-- [ ] Implementer en første leiepressindikator.
-- [ ] Legg til enhetstester for:
+- [x] Implementer kommunale kjøp og salg som stock-flow-regler.
+- [x] Implementer ikke-kommersiell andel av nybygg som egen beholdningsregel.
+- [x] Implementer en første leiepressindikator.
+- [x] Legg til enhetstester for:
 
   - stabil gjentakbarhet
   - høyere boligprisindeks øker privat igangsetting når andre forhold er like
