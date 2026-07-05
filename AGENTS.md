@@ -43,6 +43,14 @@ Dette repoet er en Vite/React/TypeScript/Tailwind-app for Oslo boligsimulator.
 - Prettier er autoritativ for TypeScript, TSX, CSS, JSON og Markdown.
 - Markdown skal brekkes rundt 80 tegn der det er praktisk.
 
+## Lokal forhåndsvisning
+
+- Start dev-serveren med `npm run dev -- --host 127.0.0.1`.
+- Åpne appen på `http://127.0.0.1:5173/bolig-simulator/` i den interne
+  nettleseren.
+- Hvis dev-serveren feiler med `listen EPERM`, kjør samme kommando med forhøyede
+  rettigheter. Begrunnelsen er at Vite må åpne en lokal port.
+
 ## Kvalitetssjekker
 
 - `npm run check` kjører formatkontroll, ESLint, TypeScript/Vite-build og
