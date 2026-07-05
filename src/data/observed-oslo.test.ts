@@ -26,6 +26,8 @@ describe("observedOsloSeries", () => {
   });
 
   it("keeps completed dwellings separate from started dwellings", () => {
+    expect(observedOsloSeries.startedDwellings.values[2013]).toBe(3_668);
+    expect(observedOsloSeries.startedDwellings.values[2014]).toBe(1_732);
     expect(observedOsloSeries.startedDwellings.values[2025]).toBe(1_764);
     expect(observedOsloSeries.completedDwellings.values[2025]).toBe(2_122);
   });

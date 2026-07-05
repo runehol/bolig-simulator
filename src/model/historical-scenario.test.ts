@@ -25,6 +25,10 @@ describe("historical scenario", () => {
     expect(historicalInitialState.housingStock.municipal).toBe(
       observedOsloSeries.municipalDwellingsAvailable.values[2015],
     );
+    expect(historicalInitialState.development.underConstruction).toEqual({
+      2015: observedOsloSeries.startedDwellings.values[2013],
+      2016: observedOsloSeries.startedDwellings.values[2014],
+    });
   });
 
   it("uses observed starts and policy rates as historical exogenous input", () => {
@@ -37,6 +41,12 @@ describe("historical scenario", () => {
   it("passes observed starts through the completion pipeline", () => {
     const result = simulateHistoricalScenario();
 
+    expect(
+      result.years.find((year) => year.year === 2015)?.completedDwellings,
+    ).toBe(observedOsloSeries.startedDwellings.values[2013]);
+    expect(
+      result.years.find((year) => year.year === 2016)?.completedDwellings,
+    ).toBe(observedOsloSeries.startedDwellings.values[2014]);
     expect(
       result.years.find((year) => year.year === 2015)?.startedDwellings,
     ).toBe(observedOsloSeries.startedDwellings.values[2015]);

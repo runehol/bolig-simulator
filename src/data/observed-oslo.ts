@@ -77,6 +77,8 @@ export const observedOsloSeries: ObservedOsloSeries = {
   startedDwellings: {
     source: ssbBuildingActivitySource,
     values: {
+      2013: 3_668,
+      2014: 1_732,
       2015: 2_328,
       2016: 4_829,
       2017: 5_555,

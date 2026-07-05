@@ -78,10 +78,10 @@ export const initialState = {
   },
   development: {
     regulatedBacklog: 25_000,
-    startedDwellings: 1_000,
+    startedDwellings: 2_150,
     underConstruction: {
-      2027: 1_200,
-      2028: 1_000,
+      2027: 1_764,
+      2028: 2_150,
     },
     completionLagYears: 2,
   },
@@ -136,8 +136,10 @@ export const defaultScenarioInputs = {
   inntekts- og boforholdsdata.
 - `regulatedBacklog` er en antakelse for å teste pipeline-logikken. Den må
   erstattes med en dokumentert reguleringsreserve.
-- `startedDwellings` og `underConstruction` er avrundede nivåer for å få første
-  simulering til å produsere ferdigstilte boliger fra 2027. De må erstattes med
-  faktiske igangsettings- og ferdigstillingstall.
+- `underConstruction` fylles med samme pipeline-regel som historisk scenario:
+  når tidligere igangsetting finnes, brukes den til forventet ferdigstillingsår;
+  når den mangler, brukes et eksplisitt fallback-estimat. For 2027 betyr det at
+  2025-igangsettingen brukes til 2027-ferdigstilling, mens 2028 foreløpig bruker
+  fallback fordi 2026-årstallet ikke finnes i kilden ennå.
 - `nonCommercial` er satt nær null fordi første modell skal vise hvordan feltet
   bygges opp gjennom scenarioet.

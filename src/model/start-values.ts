@@ -1,3 +1,5 @@
+import { observedOsloSeries } from "../data/observed-oslo";
+import { buildInitialUnderConstruction } from "./development-pipeline";
 import type {
   ModelParameters,
   ModelStart,
@@ -12,6 +14,9 @@ export const modelStart: ModelStart = {
   geography: "whole-oslo",
   dataQuality: "rough",
 };
+
+export const initialCompletionLagYears = 2;
+export const initialAnnualStartsFallback = 2_150;
 
 export const initialState: ModelState = {
   year: 2027,
@@ -30,12 +35,14 @@ export const initialState: ModelState = {
   },
   development: {
     regulatedBacklog: 25_000,
-    startedDwellings: 1_000,
-    underConstruction: {
-      2027: 1_200,
-      2028: 1_000,
-    },
-    completionLagYears: 2,
+    startedDwellings: initialAnnualStartsFallback,
+    underConstruction: buildInitialUnderConstruction({
+      startYear: modelStart.startYear,
+      completionLagYears: initialCompletionLagYears,
+      annualStartsByYear: observedOsloSeries.startedDwellings.values,
+      fallbackAnnualStarts: initialAnnualStartsFallback,
+    }),
+    completionLagYears: initialCompletionLagYears,
   },
 };
 

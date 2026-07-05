@@ -1,4 +1,5 @@
 import { observedOsloSeries, firstBacktestYears } from "../data/observed-oslo";
+import { buildInitialUnderConstruction } from "./development-pipeline";
 import { modelParameters } from "./start-values";
 import { simulateScenario } from "./simulation";
 import type {
@@ -21,6 +22,9 @@ export type HistoricalBacktestYear = {
 
 const ownerOccupiedShareOfPrivateStock = 261_000 / (261_000 + 113_000);
 const lowIncomeShareOfRenters = 40_000 / (40_000 + 73_000);
+const historicalCompletionLagYears = 2;
+const historicalInitialAnnualStartsFallback =
+  observedOsloSeries.startedDwellings.values[firstBacktestYears.start];
 
 const sumHousingStock = (state: ModelState) =>
   state.housingStock.ownerOccupied +
@@ -58,8 +62,13 @@ const buildHistoricalInitialState = (): ModelState => {
       regulatedBacklog: 25_000,
       startedDwellings:
         observedOsloSeries.startedDwellings.values[firstBacktestYears.start],
-      underConstruction: {},
-      completionLagYears: 2,
+      underConstruction: buildInitialUnderConstruction({
+        startYear: firstBacktestYears.start,
+        completionLagYears: historicalCompletionLagYears,
+        annualStartsByYear: observedOsloSeries.startedDwellings.values,
+        fallbackAnnualStarts: historicalInitialAnnualStartsFallback,
+      }),
+      completionLagYears: historicalCompletionLagYears,
     },
   };
 };

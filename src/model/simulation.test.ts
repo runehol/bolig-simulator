@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   defaultScenarioInputs,
+  initialAnnualStartsFallback,
   initialState,
   modelParameters,
   modelStart,
@@ -71,6 +72,13 @@ describe("simulateScenario", () => {
     ).toEqual(
       withoutPurchases.years.map((year) => totalHousingStock(year.state)),
     );
+  });
+
+  it("starts with a populated construction pipeline", () => {
+    expect(initialState.development.underConstruction).toEqual({
+      2027: 1_764,
+      2028: initialAnnualStartsFallback,
+    });
   });
 });
 

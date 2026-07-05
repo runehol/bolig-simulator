@@ -33,7 +33,7 @@ app-bundlen.
 | Variabel                     | Kilde       | Tabell         | Periode   | Bruk               |
 | ---------------------------- | ----------- | -------------- | --------- | ------------------ |
 | Total boligbestand           | SSB         | 06265          | 2015-2026 | evaluering         |
-| Igangsettingstillatelser     | SSB         | 05940          | 2015-2025 | modellinput/støtte |
+| Igangsettingstillatelser     | SSB         | 05940          | 2013-2025 | modellinput/støtte |
 | Fullførte boliger            | SSB         | 05940          | 2015-2025 | evaluering         |
 | Kommunalt disponerte boliger | SSB         | 12008          | 2015-2025 | kalibrering        |
 | Kommunalt eide boliger       | SSB         | 12008          | 2015-2025 | støtteserie        |
@@ -85,11 +85,13 @@ Dette er et bevisst første steg. Når pipeline og beholdningsregnskap er rimeli
 kan vi senere slå av `startedDwellingsOverride` og la utbyggerresponsen forsøke
 å forklare historiske igangsettinger.
 
-Fordi første datagrunnlag starter i 2015 og modellen har to års
-byggetidsforsinkelse, mangler scenarioet foreløpig en oppvarmingsperiode for
-2013-2014. Ferdigstilte boliger i 2015 og 2016 er derfor ikke en rettferdig test
-før eldre igangsettingsdata eller eksplisitt initial
-`underConstruction`-beholdning legges inn.
+Initial byggepipeline bygges med samme regel i historisk og framtidig scenario:
+for hvert forventet ferdigstillingsår ved modellstart brukes igangsettingen
+`completionLagYears` år tidligere. Hvis den observerte igangsettingen mangler,
+brukes et eksplisitt fallback-estimat. For 2015-backtesten betyr det at
+igangsettinger fra 2013 og 2014 fyller ferdigstillingene i 2015 og 2016. For
+2027-starten brukes observert 2025-igangsetting til 2027-ferdigstilling, mens
+2028 foreløpig bruker fallback fordi 2026-årstallet ikke finnes i kilden ennå.
 
 ## Åpne datavalg
 
