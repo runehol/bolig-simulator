@@ -38,6 +38,12 @@ testene kjøres i watch-modus:
 npm run test
 ```
 
+Formater kode og konfigurasjon:
+
+```bash
+npm run format
+```
+
 ## Struktur
 
 ```text

@@ -8,7 +8,7 @@ describe("App", () => {
     render(<App />);
 
     expect(
-      screen.getByRole("heading", { name: "Scaffold klar" })
+      screen.getByRole("heading", { name: "Scaffold klar" }),
     ).toBeInTheDocument();
     expect(screen.getByText("React + TypeScript + Vite")).toBeInTheDocument();
   });

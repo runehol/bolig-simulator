@@ -26,29 +26,29 @@ kopier hele planen inn i kode eller dokumentasjon.
 
 ## Formatering
 
-- Det finnes foreløpig ikke eget formatter-script i `package.json`.
-- Ikke anta at Prettier eller andre autoformattere er konfigurert før det
-  faktisk ligger i repoet.
+- Bruk `npm run format` for automatisk formatering.
+- Bruk `npm run format:check` for å kontrollere formatering uten å skrive filer.
 - Følg eksisterende stil:
   - 2 mellomrom innrykk i TypeScript/TSX, JSON og CSS.
   - Doble anførselstegn i TypeScript/TSX.
   - Semikolon der eksisterende TypeScript-kode bruker det.
   - CSS med én regel per blokk og lesbare linjeskift.
 - I Markdown-filer skal linjer brekkes rundt 80 tegn der det er praktisk.
-- Hvis du legger til formatter senere, legg også til npm-script og dokumenter
-  kommandoen her.
+- `docs/` er foreløpig ignorert av Prettier for å unngå store mekaniske
+  endringer i designnotatet.
 
 ## Kvalitetssjekker
 
 Kjør disse før du avslutter kodeendringer:
 
 ```bash
-npm run lint
-npm run build
+npm run check
 ```
 
-- `npm run lint` er standard sjekk for ESLint-regler.
-- `npm run build` er standard sjekk for TypeScript-prosjektbygg og Vite-build.
+- `npm run check` kjører formatkontroll, ESLint, TypeScript/Vite-build og
+  Vitest.
+- `npm run lint` kan brukes alene for ESLint-regler.
+- `npm run build` kan brukes alene for TypeScript-prosjektbygg og Vite-build.
 - Hvis du bare endrer Markdown eller ren tekst, holder det vanligvis å sjekke
   diffen og linjelengde.
 - Hvis en sjekk ikke kan kjøres, oppgi konkret kommando og feilmelding.
