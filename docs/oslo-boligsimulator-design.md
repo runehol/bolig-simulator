@@ -1,9 +1,9 @@
 # Oslo boligsimulator: designdokument
 
 Arbeidsdokument for en interaktiv what-if-simulator for boligmarked og
-boligpolitikk i Oslo. Formålet er ikke primært å spå boligpris i et bestemt
-år, men å gjøre det mulig å teste politiske grep, vise mekanismer og
-sammenligne fordelingsvirkninger over tid.
+boligpolitikk i Oslo. Formålet er ikke primært å spå boligpris i et bestemt år,
+men å gjøre det mulig å teste politiske grep, vise mekanismer og sammenligne
+fordelingsvirkninger over tid.
 
 ## Formål
 
@@ -44,8 +44,8 @@ sammenligning, ikke teknisk modellterminologi.
 ### Delbare scenarioer
 
 Et scenario skal kunne deles som en vanlig lenke. En bruker skal kunne stille
-inn politiske grep, kopiere URL-en og sende den til noen andre, som da får
-samme scenario.
+inn politiske grep, kopiere URL-en og sende den til noen andre, som da får samme
+scenario.
 
 Eksempel på enkel URL:
 
@@ -101,15 +101,14 @@ Aktuelle mekanikker:
 
 - runder eller år, der hvert år gir nye effekter på bygging, flytting,
   boligbehov, kommunal økonomi og leiepress
-- begrensede ressurser som budsjett, tomter, administrativ kapasitet og
-  politisk handlingsrom
-- målkonflikter mellom rask boligbygging, kommunal risiko, geografisk
-  fordeling, arealbruk, klima og sosial treffsikkerhet
+- begrensede ressurser som budsjett, tomter, administrativ kapasitet og politisk
+  handlingsrom
+- målkonflikter mellom rask boligbygging, kommunal risiko, geografisk fordeling,
+  arealbruk, klima og sosial treffsikkerhet
 - hendelser eller eksterne sjokk som renteøkning, byggekostnadshopp,
   Husbanken-kutt eller svakere privat igangsetting
 - scenariohistorikk som viser hvilke valg som skapte hvilke resultater
-- sammenligning mellom brukerens scenario, historisk utvikling og
-  nullalternativ
+- sammenligning mellom brukerens scenario, historisk utvikling og nullalternativ
 - delbare scenarioer uten brukerkonto
 
 Produktet bør ha indikatorer, ikke en enkel vinnertilstand. Relevante
@@ -181,21 +180,19 @@ Geografisk visning bør brukes når romlig fordeling er selve poenget:
 - regulert kapasitet og større utbyggingsområder
 - forskjell mellom gammel og ny bydelsstruktur
 
-Kart bør ikke erstatte grafer. For eksempel er "boligbestand over tid" ofte
-best som linje, stablet areal eller små multiples. Kart er best for å vise
-hvor presset, investeringene eller boligtypene ligger.
+Kart bør ikke erstatte grafer. For eksempel er "boligbestand over tid" ofte best
+som linje, stablet areal eller små multiples. Kart er best for å vise hvor
+presset, investeringene eller boligtypene ligger.
 
 Anbefalt førstevalg:
 
 - Apache ECharts for vanlige grafer, fordi det dekker mange diagramtyper, har
   Canvas/SVG-rendering, datasett/transformasjoner og innebygd støtte for
   responsivitet og tilgjengelighetsfunksjoner.
-- MapLibre GL JS for geografisk visning, fordi det kan vise
-  GeoJSON-polygonger, vektorlag, popups, tidslider og interaktive kart uten
-  Mapbox-lisensbinding.
-- deck.gl som senere tillegg hvis vi får store punkt-/polygonmengder, tunge
-  lag, mange scenarioer eller behov for mer avansert WebGL-basert
-  kartvisualisering.
+- MapLibre GL JS for geografisk visning, fordi det kan vise GeoJSON-polygonger,
+  vektorlag, popups, tidslider og interaktive kart uten Mapbox-lisensbinding.
+- deck.gl som senere tillegg hvis vi får store punkt-/polygonmengder, tunge lag,
+  mange scenarioer eller behov for mer avansert WebGL-basert kartvisualisering.
 
 Mulige alternativer:
 
@@ -203,8 +200,8 @@ Mulige alternativer:
   trangt for avansert interaksjon.
 - visx hvis vi vil ha maksimal designkontroll, men da må vi bygge mer selv.
 - Vega-Lite hvis vi vil ha deklarative, forskningsnære grafspesifikasjoner som
-  ligner mer på grammar-of-graphics-tenkning, men det kan bli tyngre å
-  tilpasse til et polert app-UI.
+  ligner mer på grammar-of-graphics-tenkning, men det kan bli tyngre å tilpasse
+  til et polert app-UI.
 
 Første prototype bør derfor bruke:
 
@@ -220,8 +217,7 @@ Viktig designregel:
 - merk usikre/imputerte geografiske tall tydelig
 - ikke bruk koropletkart for absolutte mengder uten normalisering, fordi store
   eller folkerike områder da lett ser viktigere ut enn de er
-- la brukeren klikke på et område i kartet og få samme område markert i
-  grafene
+- la brukeren klikke på et område i kartet og få samme område markert i grafene
 - la brukeren velge variabel, år og geografi i samme kontrollflate
 
 ### Foreslått kodestruktur
@@ -260,8 +256,8 @@ lese scenario, sende det til modellen og vise resultatene.
 
 Første modell bør være en bydelbasert stock-flow-modell.
 
-Den modellerer beholdninger og strømmer, ikke enkelthus og
-enkelthusholdninger. Beholdninger kan for eksempel være:
+Den modellerer beholdninger og strømmer, ikke enkelthus og enkelthusholdninger.
+Beholdninger kan for eksempel være:
 
 - lavinntektshusholdninger i privat leie i Gamle Oslo
 - barnefamilier i kommunal bolig i Stovner
@@ -283,8 +279,8 @@ Strømmer kan for eksempel være:
 ### Hvorfor ikke agentbasert modell først?
 
 En agentbasert modell kan være mer realistisk for enkelte mekanismer, men den
-krever langt mer data og er vanskeligere å forklare. For politisk what-if er
-det viktigere at modellen er lesbar, delbar og mulig å kritisere.
+krever langt mer data og er vanskeligere å forklare. For politisk what-if er det
+viktigere at modellen er lesbar, delbar og mulig å kritisere.
 
 En stock-flow-modell gir bedre førsteversjon fordi:
 
@@ -317,9 +313,8 @@ Foreslåtte standardperioder:
 
 Modellen bør ikke bruke dagens bydel som hardkodet primærnøkkel dersom
 bydelsgrensene er i endring. Bydel er politisk lesbart, men administrativt
-ustabilt. Hvis Oslo går fra dagens 15 bydeler til en ny struktur, vil
-historiske tidsserier på gammel bydel bli vanskelige å sammenligne direkte med
-nye bydeler.
+ustabilt. Hvis Oslo går fra dagens 15 bydeler til en ny struktur, vil historiske
+tidsserier på gammel bydel bli vanskelige å sammenligne direkte med nye bydeler.
 
 Anbefalt prinsipp:
 
@@ -387,8 +382,7 @@ Minimumsinndeling:
 - privat leie
 - kommunal bolig
 - ikke-kommersiell leie
-- studentbolig eller annen særskilt boligform, hvis datagrunnlaget tillater
-  det
+- studentbolig eller annen særskilt boligform, hvis datagrunnlaget tillater det
 
 Mulig inndeling etter størrelse:
 
@@ -431,8 +425,8 @@ type Scenario = {
 };
 ```
 
-Brukergrensesnittet kan starte med enkle kontrollere, men modellen bør alltid
-få en komplett tidslinje.
+Brukergrensesnittet kan starte med enkle kontrollere, men modellen bør alltid få
+en komplett tidslinje.
 
 Geografikoblinger bør ligge i egne metadatafiler, ikke inne i modellreglene:
 
@@ -480,8 +474,8 @@ geografisk konsentrert:
 - sekundærboliger
 - boliger etter størrelse og bygningstype
 
-For slike data bør modellen enten bruke en bedre fordelingsnøkkel eller
-beholde data på bydel med usikkerhetsflagg.
+For slike data bør modellen enten bruke en bedre fordelingsnøkkel eller beholde
+data på bydel med usikkerhetsflagg.
 
 Mulige fordelingsnøkler:
 
@@ -516,8 +510,7 @@ folketall. Usikkert på delbydelsnivå."
 
 ## Eksogene variabler
 
-Eksogene variabler er forhold modellen får servert, i stedet for å beregne
-selv.
+Eksogene variabler er forhold modellen får servert, i stedet for å beregne selv.
 
 Første sett:
 
@@ -568,10 +561,10 @@ krever statlig politikk, og eksterne makroforhold.
 
 ### Privat utbyggingsrespons
 
-Privat utbyggingsrespons må være en sentral del av modellen, ikke bare en
-senere forbedring. Et av de viktigste politiske spørsmålene er hvor mye
-nybygging som faktisk utløses eller bremses av pris, rente, byggekostnader,
-tomtetilgang og kommunal reguleringspolitikk.
+Privat utbyggingsrespons må være en sentral del av modellen, ikke bare en senere
+forbedring. Et av de viktigste politiske spørsmålene er hvor mye nybygging som
+faktisk utløses eller bremses av pris, rente, byggekostnader, tomtetilgang og
+kommunal reguleringspolitikk.
 
 Modellen bør derfor skille mellom:
 
@@ -646,8 +639,8 @@ Anbefaling:
 Første prototype kan fortsatt bruke historisk ferdigstilling som input i
 backtest, men framtidsscenarioer bør ha en enkel privat utbyggingsrespons fra
 starten. Ellers blir modellen for svak på et av de viktigste politiske
-spørsmålene: om kommunale og statlige grep faktisk øker, flytter, bremser
-eller endrer sammensetningen av nybygging.
+spørsmålene: om kommunale og statlige grep faktisk øker, flytter, bremser eller
+endrer sammensetningen av nybygging.
 
 ### Nybygg til boligbestand
 
@@ -673,12 +666,12 @@ Politisk påvirkning:
 
 Åpent modellspørsmål:
 
-- Skal andelen som går til privat utleie beregnes fra investoravkastning,
-  eller settes som scenarioantakelse?
+- Skal andelen som går til privat utleie beregnes fra investoravkastning, eller
+  settes som scenarioantakelse?
 - Skal kommunal og ikke-kommersiell andel tas fra ferdigstilte boliger før
   resten fordeles til eie og privat leie?
-- Hvordan skal boligstørrelse påvirke hvilke husholdninger som faktisk får
-  nytte av nybyggingen?
+- Hvordan skal boligstørrelse påvirke hvilke husholdninger som faktisk får nytte
+  av nybyggingen?
 
 Anbefaling:
 
@@ -688,8 +681,8 @@ pipeline- og utbyggingsresponsmodulen.
 
 ### Privat leie til eie
 
-Noen husholdninger går fra privat leie til eie når betalingsevne og
-lånetilgang gjør det mulig.
+Noen husholdninger går fra privat leie til eie når betalingsevne og lånetilgang
+gjør det mulig.
 
 Viktige drivere:
 
@@ -710,8 +703,8 @@ Politisk påvirkning:
 
 Åpent modellspørsmål:
 
-- Skal modellen skille mellom ønsket overgang til eie og presset overgang ut
-  av Oslo?
+- Skal modellen skille mellom ønsket overgang til eie og presset overgang ut av
+  Oslo?
 
 ### Privat leie til kommunal eller ikke-kommersiell bolig
 
@@ -750,11 +743,10 @@ Mulige utfall:
 - husholdningen flytter til billigere bydel
 - husholdningen flytter ut av Oslo
 - husholdningen blir trangbodd
-- husholdningen får kommunal eller ikke-kommersiell bolig hvis kapasitet
-  finnes
+- husholdningen får kommunal eller ikke-kommersiell bolig hvis kapasitet finnes
 
-Dette er vanskelig å kalibrere, men politisk viktig. Første versjon kan bruke
-en enkel pressindeks som styrer fordeling mellom disse utfallene.
+Dette er vanskelig å kalibrere, men politisk viktig. Første versjon kan bruke en
+enkel pressindeks som styrer fordeling mellom disse utfallene.
 
 ### Kommunale kjøp og salg
 
@@ -786,9 +778,9 @@ Må skilles fra:
 
 ### Sekundærboliger og privat utleietilbud
 
-Sekundærboliger påvirker både eie- og leiemarkedet. Tiltak mot
-sekundærboliger kan redusere spekulativ etterspørsel, men også redusere
-privat leietilbud hvis boliger selges til eiere.
+Sekundærboliger påvirker både eie- og leiemarkedet. Tiltak mot sekundærboliger
+kan redusere spekulativ etterspørsel, men også redusere privat leietilbud hvis
+boliger selges til eiere.
 
 Mulige strømmer:
 
@@ -852,8 +844,8 @@ Det må skilles mellom:
 - output modellen skal forsøke å treffe
 - observerte verdier som brukes til evaluering
 
-Hvis modellen mates med alt, tester den ingenting. Hvis den mates med for
-lite, blir den for løs. Første kalibreringsmål bør derfor være begrenset.
+Hvis modellen mates med alt, tester den ingenting. Hvis den mates med for lite,
+blir den for løs. Første kalibreringsmål bør derfor være begrenset.
 
 Foreslåtte første kalibreringsmål:
 
@@ -939,8 +931,8 @@ udekket behov neste år =
 
 ### Ikke-kommersiell bolig
 
-Ikke-kommersiell bolig bør ikke behandles som bare "billig kommunal bolig".
-Den kan ha annen målgruppe, annen finansiering og annen innlåsing.
+Ikke-kommersiell bolig bør ikke behandles som bare "billig kommunal bolig". Den
+kan ha annen målgruppe, annen finansiering og annen innlåsing.
 
 Modellen må skille mellom:
 
@@ -962,8 +954,8 @@ Foreløpig kildekategori:
 
 - Oslo kommune: kommunale boliger, Boligbygg, boligbehov, plan, regulering,
   årsrapporter og budsjett
-- Oslo kommune: bydelsreform, delbydeler, grunnkretser og koblingsnøkler
-  mellom gammel og ny bydelsstruktur
+- Oslo kommune: bydelsreform, delbydeler, grunnkretser og koblingsnøkler mellom
+  gammel og ny bydelsstruktur
 - SSB: befolkning, husholdninger, boligbestand, boligpriser, leie, inntekt og
   boforhold
 - Husbanken: startlån, bostøtte og relevante kommune-/fylkestall
@@ -972,8 +964,8 @@ Foreløpig kildekategori:
 - Leieboerforeningen, NOU-er og offentlige utredninger for mekanismer og
   leiemarked
 
-Kildebruk må være reproduserbar. For SSB-data bør tabellnummer og
-API-spørring dokumenteres i scripts eller metadata.
+Kildebruk må være reproduserbar. For SSB-data bør tabellnummer og API-spørring
+dokumenteres i scripts eller metadata.
 
 ## Gjennomførbarhet og politisk avgrensing
 
@@ -985,8 +977,8 @@ Simulatoren må skille mellom:
 - grep som krever statlig finansiering eller Husbanken-endringer
 - makroforhold som ikke er politiske kontroller for Oslo
 
-Dette bør vises i UI, slik at brukeren ikke får inntrykk av at Oslo kommune
-kan styre alt direkte.
+Dette bør vises i UI, slik at brukeren ikke får inntrykk av at Oslo kommune kan
+styre alt direkte.
 
 ## Åpne spørsmål
 
@@ -997,10 +989,9 @@ kan styre alt direkte.
 - Skal modellen først være forklarende/pedagogisk, eller forsøke kalibrert
   historisk treff fra starten?
 - Hvor detaljert skal ikke-kommersiell boligmodell være i første versjon?
-- Hvilke deler av modellen skal være "Oslo kan gjøre dette", og hvilke skal
-  være "ekstern forutsetning"?
-- Hvor enkel kan privat utbyggingsrespons være før den blir politisk
-  misvisende?
+- Hvilke deler av modellen skal være "Oslo kan gjøre dette", og hvilke skal være
+  "ekstern forutsetning"?
+- Hvor enkel kan privat utbyggingsrespons være før den blir politisk misvisende?
 - Skal tomtetilgang modelleres som fysisk areal, regulerte boliger, kommunal
   tomtebank eller en samlet kapasitetsindeks?
 - Bør intern modellgeografi være delbydel, grunnkrets eller en egen stabil
@@ -1026,8 +1017,8 @@ Første tekniske prototype bør være:
   delbydel/gammel bydel/ny bydel
 - årlige tidssteg
 - startår 2015 eller 2027, valgt i UI
-- tre politiske spaker: kommunale kjøp, kommunale salg og ikke-kommersiell
-  andel av nybygg
+- tre politiske spaker: kommunale kjøp, kommunale salg og ikke-kommersiell andel
+  av nybygg
 - tre eksterne spaker: rente, befolkningsvekst og byggekostnad
 - en enkel privat utbyggingsrespons basert på prosjektmargin og tilgjengelig
   regulert kapasitet
