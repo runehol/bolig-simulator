@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import { defaultScenarioInputs, modelStart } from "../model/start-values";
 import { simulateScenario } from "../model/simulation";
-import type { ScenarioInputs, SimulationYearResult } from "../model/types";
+import type {
+  HousingStock,
+  ScenarioInputs,
+  SimulationYearResult,
+} from "../model/types";
 import {
   defaultScenarioUrlState,
   parseScenarioUrlState,
@@ -25,6 +29,7 @@ type ScenarioFormState = ScenarioUrlState;
 type ChartSeries = {
   key: string;
   label: string;
+  normalization: "own-start" | "total-housing-stock-start";
   color: string;
   values: number[];
 };
@@ -156,14 +161,18 @@ const formatMetricValue = (value: number, decimals = 0) =>
 const formatNumberInputValue = (value: number) =>
   Number.isInteger(value) ? String(value) : value.toFixed(1);
 
-const normalizeSeries = (values: number[]) => {
-  const firstValue = values[0];
+const totalHousingStock = (housingStock: HousingStock) =>
+  housingStock.ownerOccupied +
+  housingStock.privateRental +
+  housingStock.municipal +
+  housingStock.nonCommercial;
 
-  if (firstValue === 0) {
+const normalizeSeries = (values: number[], baseValue: number) => {
+  if (baseValue === 0) {
     return values.map(() => 100);
   }
 
-  return values.map((value) => (value / firstValue) * 100);
+  return values.map((value) => (value / baseValue) * 100);
 };
 
 const buildPath = (
@@ -191,27 +200,38 @@ const buildPath = (
 
 const buildChartSeries = (years: SimulationYearResult[]): ChartSeries[] => [
   {
+    key: "totalHousingStock",
+    label: "Total boligbestand",
+    color: "#17211c",
+    normalization: "total-housing-stock-start",
+    values: years.map((year) => totalHousingStock(year.state.housingStock)),
+  },
+  {
     key: "municipal",
     label: "Kommunal boligbestand",
     color: "#b13f2d",
+    normalization: "total-housing-stock-start",
     values: years.map((year) => year.state.housingStock.municipal),
   },
   {
     key: "nonCommercial",
     label: "Ikke-kommersiell boligbestand",
     color: "#276e62",
+    normalization: "total-housing-stock-start",
     values: years.map((year) => year.state.housingStock.nonCommercial),
   },
   {
     key: "price",
     label: "Boligprisindeks",
     color: "#365f91",
+    normalization: "own-start",
     values: years.map((year) => year.state.housingPriceIndex),
   },
   {
     key: "pressure",
     label: "Privat leiepress",
     color: "#82612b",
+    normalization: "own-start",
     values: years.map((year) => year.privateRentalPressure),
   },
 ];
@@ -280,9 +300,11 @@ function ScenarioControl({
 }
 
 function IndexedLineChart({
+  firstYearTotalHousingStock,
   years,
   series,
 }: {
+  firstYearTotalHousingStock: number;
   years: number[];
   series: ChartSeries[];
 }) {
@@ -291,7 +313,12 @@ function IndexedLineChart({
   const padding = 42;
   const normalizedSeries = series.map((item) => ({
     ...item,
-    values: normalizeSeries(item.values),
+    values: normalizeSeries(
+      item.values,
+      item.normalization === "total-housing-stock-start"
+        ? firstYearTotalHousingStock
+        : item.values[0],
+    ),
   }));
   const allValues = normalizedSeries.flatMap((item) => item.values);
   const minValue = Math.min(95, ...allValues);
@@ -445,6 +472,9 @@ export function App() {
   const chartSeries = buildChartSeries(years);
   const firstYear = years[0];
   const lastYear = years[years.length - 1];
+  const firstYearTotalHousingStock = totalHousingStock(
+    firstYear.state.housingStock,
+  );
 
   useEffect(() => {
     const nextSearch = serializeScenarioSearch(formState);
@@ -562,8 +592,8 @@ export function App() {
                   Utvikling over tid
                 </h2>
                 <p className="m-0 mt-1 text-sm text-[#68746d]">
-                  Første graf er indeksert med første modellår = 100. Tabellen
-                  viser faktiske verdier.
+                  Boligbestand er indeksert mot total boligbestand i første
+                  modellår = 100. Tabellen viser faktiske verdier.
                 </p>
               </div>
               <p className="m-0 text-sm font-semibold text-[#435048]">
@@ -571,11 +601,16 @@ export function App() {
               </p>
             </div>
 
-            <IndexedLineChart series={chartSeries} years={chartYears} />
+            <IndexedLineChart
+              firstYearTotalHousingStock={firstYearTotalHousingStock}
+              series={chartSeries}
+              years={chartYears}
+            />
             <div className="mt-4 grid gap-3 border-t border-[#eee8dd] pt-4 text-sm leading-snug text-[#435048] md:grid-cols-2">
               <p className="m-0">
-                Grafen viser relativ utvikling, ikke nivå. Alle serier starter
-                på 100 for å gjøre retning og tempo sammenlignbart.
+                Total boligbestand starter på 100. Kommunal og ikke-kommersiell
+                boligbestand vises som andel av samme starttotal, slik at
+                nivåene kan sammenlignes.
               </p>
               <p className="m-0">
                 Første prototype bruker grove startverdier og ukalibrerte

@@ -131,13 +131,16 @@ Mål: gjøre modellkjernen synlig og justerbar i appen.
 - [x] Vis valgt startår, sluttår og modellversjon.
 - [x] Vis de første fire tidsseriene i samme graf:
 
+  - total boligbestand
   - kommunal boligbestand
   - ikke-kommersiell boligbestand
   - modellert boligprisindeks
   - privat leiepress
 
-- [x] Normaliser første graf med første modellår = 100 for hver serie, slik at
-      utviklingen kan sammenlignes på tvers av ulike enheter.
+- [x] Normaliser boligbestand i første graf slik at total boligbestand i første
+      modellår = 100. Kommunal og ikke-kommersiell boligbestand vises mot samme
+      starttotal, mens prisindeks og leiepress fortsatt indekseres mot egen
+      startverdi.
 - [x] Vis faktiske verdier i tabell under grafen.
 - [x] Behandle normalisering til første år = 100 som en regel for første
       scenario-UI, ikke som en generell regel for alle framtidige

@@ -31,8 +31,9 @@ describe("App", () => {
     expect(
       screen.getByText(/Kommunalt disponerte boliger/),
     ).toBeInTheDocument();
+    expect(screen.getByText("Total boligbestand")).toBeInTheDocument();
     expect(
-      screen.getByText(/Grafen viser relativ utvikling/),
+      screen.getByText(/Total boligbestand starter på 100/),
     ).toBeInTheDocument();
   });
 
