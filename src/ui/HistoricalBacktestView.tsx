@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import { observedOsloSeries } from "../data/observed-oslo";
 import {
   compareHistoricalBacktest,
   historicalModelStart,
@@ -78,11 +79,28 @@ const buildHistoricalCompletedSeries = (
   },
 ];
 
+const buildHistoricalPolicyRateSeries = (
+  rows: HistoricalBacktestRows,
+): ScenarioChartSeries[] => [
+  {
+    key: "policyRate",
+    label: "Styringsrente",
+    color: "#6f5b9a",
+    decimals: 1,
+    unit: "%",
+    values: rows.map(
+      (row) =>
+        observedOsloSeries.policyRateAnnualAverage.values[row.year] * 100,
+    ),
+  },
+];
+
 export function HistoricalBacktestView() {
   const comparisonRows = useMemo(() => compareHistoricalBacktest(), []);
   const chartYears = comparisonRows.map((row) => row.year);
   const housingStockSeries = buildHistoricalHousingStockSeries(comparisonRows);
   const completedSeries = buildHistoricalCompletedSeries(comparisonRows);
+  const policyRateSeries = buildHistoricalPolicyRateSeries(comparisonRows);
   const stockMae = calculateMeanAbsoluteError(
     comparisonRows.map((row) => row.totalHousingStockError),
   );
@@ -170,6 +188,18 @@ export function HistoricalBacktestView() {
       >
         Ferdigstillelser fra modellen sammenlignet med observerte ferdigstilte
         boliger.
+      </ChartPanel>
+
+      <ChartPanel
+        ariaLabel="Historisk styringsrente"
+        periodLabel={periodLabel}
+        series={policyRateSeries}
+        title="Styringsrente"
+        valueFloor={0}
+        years={chartYears}
+      >
+        Årsgjennomsnitt av historisk styringsrente, brukt som eksogen input i
+        backtesten.
       </ChartPanel>
 
       <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">

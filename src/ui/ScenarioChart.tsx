@@ -23,8 +23,10 @@ echarts.use([
 
 export type ScenarioChartSeries = {
   color: string;
+  decimals?: number;
   key: string;
   label: string;
+  unit?: string;
   values: number[];
 };
 
@@ -47,29 +49,41 @@ const numberFormatter = new Intl.NumberFormat("nb-NO", {
   maximumFractionDigits: 0,
 });
 
-const tooltipFormatter = (params: unknown) => {
-  if (!Array.isArray(params)) {
-    return "";
-  }
+const formatSeriesValue = (
+  value: number,
+  { decimals = 0, unit }: Pick<ScenarioChartSeries, "decimals" | "unit">,
+) =>
+  `${new Intl.NumberFormat("nb-NO", {
+    maximumFractionDigits: decimals,
+    minimumFractionDigits: decimals,
+  }).format(value)}${unit === undefined ? "" : ` ${unit}`}`;
 
-  const rows = params
-    .map((item) => {
-      const point = item as {
-        color?: string;
-        marker?: string;
-        seriesName?: string;
-        value?: [number, number];
-      };
-      const value = Array.isArray(point.value) ? point.value[1] : undefined;
+const buildTooltipFormatter =
+  (series: ScenarioChartSeries[]) => (params: unknown) => {
+    if (!Array.isArray(params)) {
+      return "";
+    }
 
-      return `<div>${point.marker ?? ""}${point.seriesName ?? ""}: <strong>${numberFormatter.format(Number(value ?? 0))}</strong></div>`;
-    })
-    .join("");
-  const year = (params[0] as { axisValueLabel?: string } | undefined)
-    ?.axisValueLabel;
+    const rows = params
+      .map((item) => {
+        const point = item as {
+          color?: string;
+          marker?: string;
+          seriesName?: string;
+          seriesIndex?: number;
+          value?: [number, number];
+        };
+        const value = Array.isArray(point.value) ? point.value[1] : undefined;
+        const seriesConfig = series[point.seriesIndex ?? 0];
 
-  return `<div><strong>${year ?? ""}</strong></div>${rows}`;
-};
+        return `<div>${point.marker ?? ""}${point.seriesName ?? ""}: <strong>${formatSeriesValue(Number(value ?? 0), seriesConfig ?? {})}</strong></div>`;
+      })
+      .join("");
+    const year = (params[0] as { axisValueLabel?: string } | undefined)
+      ?.axisValueLabel;
+
+    return `<div><strong>${year ?? ""}</strong></div>${rows}`;
+  };
 
 const buildOption = ({
   series,
@@ -108,7 +122,7 @@ const buildOption = ({
           ? params.value[1]
           : params.value;
 
-        return numberFormatter.format(Number(value ?? 0));
+        return formatSeriesValue(Number(value ?? 0), item);
       },
       show: true,
     },
@@ -126,7 +140,7 @@ const buildOption = ({
       type: "line",
     },
     confine: true,
-    formatter: tooltipFormatter,
+    formatter: buildTooltipFormatter(series),
     trigger: "axis",
   },
   xAxis: {

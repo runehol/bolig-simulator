@@ -56,7 +56,8 @@ export function ChartPanel({
               />
               <span className="text-[#435048]">{item.label}</span>
               <span className="ml-auto font-semibold text-[#17211c]">
-                {formatMetricValue(finalValue)}
+                {formatMetricValue(finalValue, item.decimals ?? 0)}
+                {item.unit === undefined ? "" : ` ${item.unit}`}
               </span>
             </div>
           );

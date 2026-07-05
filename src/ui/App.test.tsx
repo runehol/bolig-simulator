@@ -156,6 +156,12 @@ describe("App", () => {
         name: "Historisk test av ferdigstilte boliger",
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "Historisk styringsrente",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Styringsrente").length).toBeGreaterThan(0);
     expect(screen.getByText("Boligbestand MAE")).toBeInTheDocument();
     expect(screen.getByText("Ferdigstilt MAPE")).toBeInTheDocument();
     expect(
