@@ -226,7 +226,7 @@ export function ScenarioChart({
   return (
     <div
       aria-label={ariaLabel}
-      className="h-[22rem] w-full"
+      className="h-[22rem] w-full max-w-full"
       ref={containerRef}
       role="img"
     />

@@ -25,7 +25,7 @@ export function ChartPanel({
   years,
 }: ChartPanelProps) {
   return (
-    <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+    <section className="min-w-0 max-w-full rounded-lg border border-[#ddd8cd] bg-white p-5">
       <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           <h2 className="m-0 text-xl font-semibold">{title}</h2>

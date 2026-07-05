@@ -186,7 +186,7 @@ function ScenarioControl({
         </label>
         <span className="text-xs text-[#68746d]">{definition.suffix}</span>
       </div>
-      <div className="grid grid-cols-[1fr_6.5rem] items-center gap-3">
+      <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_6.5rem]">
         <input
           aria-label={`${definition.label} slider`}
           className="h-2 w-full cursor-pointer accent-[#b13f2d]"
@@ -201,7 +201,7 @@ function ScenarioControl({
         />
         <input
           aria-label={definition.label}
-          className="h-10 w-full rounded-md border border-[#cfc7b8] bg-white px-2 text-right text-sm text-[#17211c]"
+          className="h-10 w-full max-w-[8rem] rounded-md border border-[#cfc7b8] bg-white px-2 text-right text-sm text-[#17211c] sm:max-w-none"
           id={inputId}
           max={definition.max}
           min={definition.min}
@@ -260,7 +260,7 @@ export function ScenarioWorkshopView({
       </header>
 
       <div className="grid gap-6 xl:grid-cols-[23rem_1fr]">
-        <aside className="self-start rounded-lg border border-[#ddd8cd] bg-white p-5">
+        <aside className="w-full max-w-[32rem] self-start rounded-lg border border-[#ddd8cd] bg-white p-5 xl:max-w-none">
           <h2 className="m-0 text-xl font-semibold">Scenario</h2>
           <p className="mt-2 text-sm text-[#68746d]">
             Slidere gir rask utforsking. Nummerfeltene kan brukes for presise
@@ -301,8 +301,8 @@ export function ScenarioWorkshopView({
           })}
         </aside>
 
-        <section className="grid gap-6">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid min-w-0 gap-6">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-4">
             <SummaryCard
               explanation="Kommunalt disponerte boliger etter kjøp, salg og modellert beholdningsendring."
               label="Kommunale boliger"

@@ -122,7 +122,7 @@ export function HistoricalBacktestView() {
   const periodLabel = `${historicalModelStart.startYear}-${historicalModelStart.endYear}`;
 
   return (
-    <section className="grid gap-6">
+    <section className="grid min-w-0 gap-6">
       <header className="max-w-5xl">
         <h1 className="m-0 text-3xl leading-[1.1] tracking-normal sm:text-5xl">
           Historisk test
@@ -135,7 +135,7 @@ export function HistoricalBacktestView() {
         </p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-4">
         <SummaryCard
           explanation="Gjennomsnittlig absolutt årsavvik mellom modellert og observert total boligbestand."
           label="Boligbestand MAE"
