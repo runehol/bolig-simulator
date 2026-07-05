@@ -10,6 +10,8 @@ describe("App", () => {
     expect(
       screen.getByRole("heading", { name: "Scaffold klar" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("React + TypeScript + Vite")).toBeInTheDocument();
+    expect(
+      screen.getByText("React + TypeScript + Tailwind + Vite"),
+    ).toBeInTheDocument();
   });
 });

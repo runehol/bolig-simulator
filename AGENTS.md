@@ -1,6 +1,6 @@
 # Arbeidsregler for agenter
 
-Dette repoet er en Vite/React/TypeScript-app for Oslo boligsimulator.
+Dette repoet er en Vite/React/TypeScript/Tailwind-app for Oslo boligsimulator.
 `docs/oslo-boligsimulator-design.md` er produkt- og modellreferansen.
 
 ## Før du endrer
@@ -12,11 +12,13 @@ Dette repoet er en Vite/React/TypeScript-app for Oslo boligsimulator.
 
 ## Kode
 
-- Bruk TypeScript, React og eksisterende Vite-oppsett.
+- Bruk TypeScript, React, Tailwind CSS og eksisterende Vite-oppsett.
 - Simuleringslogikk skal ikke ligge i React-komponenter.
 - Modellkode hører hjemme under `src/model/` når den innføres.
 - Scenario-URL-logikk hører hjemme under `src/routing/` når den innføres.
 - UI-kode hører hjemme under `src/ui/`.
+- Bruk Tailwind utility-klasser som standard for layout og komponentstil.
+- Behold `src/styles.css` til Tailwind-import og global basestil.
 
 ## Tester
 
