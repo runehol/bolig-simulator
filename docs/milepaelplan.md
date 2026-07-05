@@ -46,6 +46,19 @@ Mål: lukke de viktigste valgene før modellkoden blir for bred.
       en enkel privat utbyggingsrespons.
 - [ ] Avklar startverdier for boligprisindeks, regulert backlog, igangsatte
       boliger og byggetidsforsinkelse.
+- [ ] Bekreft første husholdningsgrupper:
+
+  - `lowIncomeRenters`
+  - `otherRenters`
+  - `ownerHouseholds`
+
+- [ ] Bekreft første disposisjonsformer for boligbestand:
+
+  - `ownerOccupied`
+  - `privateRental`
+  - `municipal`
+  - `nonCommercial`
+
 - [ ] Velg første outputsett for UI:
 
   - kommunal boligbestand
@@ -76,6 +89,10 @@ Mål: etablere en ren modellkjerne uten UI-avhengigheter.
       ferdigstilte boliger som egen pipeline.
 - [ ] Implementer privat igangsetting som respons på boligprisindeks,
       byggekostnad, rente, ikke-kommersielt krav og regulert kapasitet.
+- [ ] Implementer første husholdningsgrupper som enkel modelltilstand:
+      `lowIncomeRenters`, `otherRenters` og `ownerHouseholds`.
+- [ ] Implementer boligbestand etter disposisjonsform: `ownerOccupied`,
+      `privateRental`, `municipal` og `nonCommercial`.
 - [ ] Implementer kommunale kjøp og salg som stock-flow-regler.
 - [ ] Implementer ikke-kommersiell andel av nybygg som egen beholdningsregel.
 - [ ] Implementer en første leiepressindikator.
@@ -85,6 +102,8 @@ Mål: etablere en ren modellkjerne uten UI-avhengigheter.
   - høyere boligprisindeks øker privat igangsetting når andre forhold er like
   - høyere rente eller byggekostnad reduserer privat igangsetting
   - igangsatte boliger blir ferdigstilt etter valgt byggetidsforsinkelse
+  - kommunale kjøp flytter boliger til kommunal bestand uten nødvendigvis å øke
+    samlet boligbestand
   - kommunale kjøp øker kommunal boligbestand
   - kommunale salg reduserer kommunal boligbestand
   - ikke-kommersiell nybyggandel øker ikke-kommersiell beholdning

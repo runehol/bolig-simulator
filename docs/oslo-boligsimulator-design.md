@@ -361,28 +361,39 @@ Mulig senere nivå:
 
 ### Husholdningsgrupper
 
-Første versjon bør ha få, men politisk relevante grupper:
+Første modell bør ha få husholdningsgrupper, slik at flytene blir forklarbare
+før datagrunnlaget og reglene blir mer detaljerte:
 
-- lavinntekt enslige
-- lavinntekt barnefamilier
-- unge førstegangsetablerere
-- studenter og midlertidige husholdninger
-- vanlige leietakerhusholdninger
-- eierhusholdninger med lav eller moderat inntekt
-- høyinntekt eierhusholdninger
+- `lowIncomeRenters`: lavinntektshusholdninger i privat leie
+- `otherRenters`: øvrige husholdninger i privat leie
+- `ownerHouseholds`: husholdninger som eier egen bolig
 
-Dette må senere kalibreres mot tilgjengelige data. Det viktigste er å skille
-grupper som har ulik betalingsevne, boligbehov og sårbarhet.
+Dette er smalere enn den endelige politiske målgruppen, men gir en tydelig
+første modell: lavinntektsleietakere er mest sårbare for leiepress, øvrige
+leietakere påvirker privat leieetterspørsel, og eierhusholdninger trengs for å
+modellere boligpris, eieetterspørsel og kommunale kjøp fra eksisterende marked.
+
+Senere kan gruppene deles opp etter husholdningstype, livsfase, inntekt eller
+boligstørrelse, for eksempel barnefamilier, studenter og førstegangsetablerere.
+Det bør vente til første stock-flow-kjerne er kalibrert og vi vet hvilke data
+som faktisk finnes.
 
 ### Boligtyper og disposisjonsform
 
-Minimumsinndeling:
+Boligbestanden bør likevel skilles etter disposisjonsform fra starten:
 
-- eie
-- privat leie
-- kommunal bolig
-- ikke-kommersiell leie
-- studentbolig eller annen særskilt boligform, hvis datagrunnlaget tillater det
+- `ownerOccupied`: eierboliger
+- `privateRental`: private utleieboliger
+- `municipal`: kommunale boliger
+- `nonCommercial`: ikke-kommersielle boliger
+
+Dette skillet er nødvendig selv om husholdningsgruppene er få. Kommunale kjøp
+skaper for eksempel ikke nødvendigvis nye boliger; de kan flytte boliger fra eie
+eller privat leie til kommunal boligbestand. Nybygg øker derimot samlet
+boligbestand før de fordeles på disposisjonsform.
+
+Studentbolig eller annen særskilt boligform kan legges til senere hvis
+datagrunnlaget tilsier det.
 
 Mulig inndeling etter størrelse:
 
