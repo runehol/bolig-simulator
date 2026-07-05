@@ -125,13 +125,25 @@ output uten React.
 
 Mål: gjøre modellkjernen synlig og justerbar i appen.
 
-- [ ] Erstatt scaffold-visningen med et enkelt scenarioverksted.
-- [ ] Legg kontrollere for de første politiske spakene.
-- [ ] Legg kontrollere for de første eksterne spakene.
-- [ ] Vis valgt startår, sluttår og modellversjon.
-- [ ] Vis modelloutput som en kompakt tabell eller enkel tidslinjevisning.
-- [ ] Merk eksempeldata og grove antakelser tydelig i brukerflaten.
-- [ ] Legg til komponenttester for brukerobserverbar oppførsel:
+- [x] Erstatt scaffold-visningen med et enkelt scenarioverksted.
+- [x] Legg kontrollere for de første politiske spakene.
+- [x] Legg kontrollere for de første eksterne spakene.
+- [x] Vis valgt startår, sluttår og modellversjon.
+- [x] Vis de første fire tidsseriene i samme graf:
+
+  - kommunal boligbestand
+  - ikke-kommersiell boligbestand
+  - modellert boligprisindeks
+  - privat leiepress
+
+- [x] Normaliser første graf med første modellår = 100 for hver serie, slik at
+      utviklingen kan sammenlignes på tvers av ulike enheter.
+- [x] Vis faktiske verdier i tabell under grafen.
+- [x] Behandle normalisering til første år = 100 som en regel for første
+      scenario-UI, ikke som en generell regel for alle framtidige
+      visualiseringer.
+- [x] Merk eksempeldata og grove antakelser tydelig i brukerflaten.
+- [x] Legg til komponenttester for brukerobserverbar oppførsel:
 
   - endring i kjøp oppdaterer output
   - endring i salg oppdaterer output

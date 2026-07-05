@@ -1,7 +1,7 @@
 # Oslo boligsimulator
 
-Grunnoppsett for en interaktiv, statisk webapp for what-if-scenarioer om
-boligmarked og boligpolitikk i Oslo.
+Interaktiv, statisk webapp for what-if-scenarioer om boligmarked og
+boligpolitikk i Oslo.
 
 Live side: <https://runehol.github.io/bolig-simulator/>
 
@@ -11,8 +11,10 @@ Stacken følger designnotatet:
 - React, Tailwind CSS og Vite for brukergrensesnitt og statisk bygg
 - GitHub Pages og GitHub Actions for første deploy
 
-ECharts, MapLibre GL JS og en Web Worker kan legges til når de første faktiske
-visningene og simuleringsflytene implementeres.
+Første scenarioverksted kjører en deterministisk modell i nettleseren, med
+slidere, nummerfelt, normalisert tidsseriegraf og tabell med faktiske verdier.
+ECharts, MapLibre GL JS og en Web Worker kan legges til når visnings- og
+simuleringsbehovene blir mer avanserte.
 
 ## Kom i gang
 
