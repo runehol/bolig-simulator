@@ -53,6 +53,7 @@ npm run format
 
 ```text
 src/
+  data/        observerte serier og kildemetadata for backtest
   model/       simuleringslogikk, startverdier og modelltester
   routing/     parsing og serialisering av delbare scenario-URL-er
   test/        felles testoppsett
@@ -63,4 +64,5 @@ src/
 
 Simuleringslogikken ligger i `src/model`, ikke i React-komponentene. Første
 modellkjerne kjører hele Oslo som én enhet fra 2027 til 2040 med grove,
-utskiftbare startverdier fra `src/model/start-values.ts`.
+utskiftbare startverdier fra `src/model/start-values.ts`. Observerte serier for
+historisk sammenligning ligger separat i `src/data/`.

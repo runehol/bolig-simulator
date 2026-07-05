@@ -222,7 +222,7 @@ ikke bare som teknisk demonstrasjon.
 
 Mål: begynne overgangen fra eksempelmodell til kildebasert modell.
 
-- [ ] Kartlegg første åpne datakilder for:
+- [x] Kartlegg første åpne datakilder for:
 
   - befolkning og husholdninger
   - boligbestand
@@ -231,10 +231,16 @@ Mål: begynne overgangen fra eksempelmodell til kildebasert modell.
   - rente
   - byggekostnad eller relevant kostnadsindeks
 
-- [ ] Dokumenter tabellnummer, API-spørringer eller filkilder der data hentes.
-- [ ] Skill modellinput fra evalueringsdata.
+- [x] Dokumenter tabellnummer, API-spørringer eller filkilder der data hentes i
+      `docs/datakilder.md`.
+- [x] Skill modellinput fra evalueringsdata med observerte serier i
+      `src/data/observed-oslo.ts`.
 - [ ] Lag et historisk scenario for 2015 til siste tilgjengelige år.
-- [ ] Velg et begrenset første kalibreringsmål.
+- [x] Velg et begrenset første kalibreringsmål:
+
+  - total boligbestand
+  - fullførte boliger
+
 - [ ] Vis historisk output mot observert serie for minst ett mål.
 
 Ferdig når: repoet kan kjøre en enkel historisk sammenligning uten at modellen
