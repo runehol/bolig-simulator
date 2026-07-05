@@ -25,10 +25,24 @@ Bygg produksjonsversjonen:
 npm run build
 ```
 
+Kjør kvalitetssjekkene:
+
+```bash
+npm run check
+```
+
+Dette kjører lint, produksjonsbygg og Vitest-testene. Under utvikling kan
+testene kjøres i watch-modus:
+
+```bash
+npm run test
+```
+
 ## Struktur
 
 ```text
 src/
+  test/        felles testoppsett
   ui/          React-komponenter
   main.tsx     React-entrypoint
   styles.css   global styling
