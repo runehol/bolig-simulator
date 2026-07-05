@@ -1,0 +1,17 @@
+export function SummaryCard({
+  explanation,
+  label,
+  value,
+}: {
+  explanation: string;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-lg border border-[#ddd8cd] bg-white p-4">
+      <p className="m-0 text-sm text-[#68746d]">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
+      <p className="mt-3 text-sm leading-snug text-[#435048]">{explanation}</p>
+    </div>
+  );
+}

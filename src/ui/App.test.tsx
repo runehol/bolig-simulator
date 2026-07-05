@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 
@@ -133,10 +133,16 @@ describe("App", () => {
   it("shows historical backtest as a top-level tab", async () => {
     const user = userEvent.setup();
 
+    window.history.replaceState(
+      null,
+      "",
+      "/bolig-simulator/?kjop=1500&rente=5.5",
+    );
     render(<App />);
 
     await user.click(screen.getByRole("tab", { name: "Historisk test" }));
 
+    expect(window.location.search).toBe("?vis=historisk");
     expect(
       screen.getByRole("heading", { name: "Historisk test" }),
     ).toBeInTheDocument();
@@ -155,5 +161,27 @@ describe("App", () => {
     expect(
       screen.getByRole("columnheader", { name: "Avvik bestand" }),
     ).toBeInTheDocument();
+  });
+
+  it("uses browser history to return from historical testing to the previous scenario", async () => {
+    const user = userEvent.setup();
+
+    window.history.replaceState(
+      null,
+      "",
+      "/bolig-simulator/?kjop=1500&rente=5.5",
+    );
+    render(<App />);
+
+    await user.click(screen.getByRole("tab", { name: "Historisk test" }));
+    expect(window.location.search).toBe("?vis=historisk");
+
+    window.history.back();
+
+    await waitFor(() =>
+      expect(window.location.search).toBe("?kjop=1500&rente=5.5"),
+    );
+    expect(screen.getByLabelText("Kommunale kjøp per år")).toHaveValue(1500);
+    expect(screen.getByLabelText("Rente")).toHaveValue(5.5);
   });
 });
