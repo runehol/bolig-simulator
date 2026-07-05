@@ -3,6 +3,8 @@
 Grunnoppsett for en interaktiv, statisk webapp for what-if-scenarioer om
 boligmarked og boligpolitikk i Oslo.
 
+Live side: <https://runehol.github.io/bolig-simulator/>
+
 Stacken følger designnotatet:
 
 - TypeScript for simuleringsmotor og datamodell
