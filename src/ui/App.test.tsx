@@ -142,7 +142,8 @@ describe("App", () => {
 
     await user.click(screen.getByRole("tab", { name: "Historisk test" }));
 
-    expect(window.location.search).toBe("?vis=historisk");
+    expect(window.location.search).toBe("");
+    expect(window.location.hash).toBe("#/historisk");
     expect(
       screen.getByRole("heading", { name: "Historisk test" }),
     ).toBeInTheDocument();
@@ -180,14 +181,26 @@ describe("App", () => {
     render(<App />);
 
     await user.click(screen.getByRole("tab", { name: "Historisk test" }));
-    expect(window.location.search).toBe("?vis=historisk");
+    expect(window.location.search).toBe("");
+    expect(window.location.hash).toBe("#/historisk");
 
     window.history.back();
 
     await waitFor(() =>
       expect(window.location.search).toBe("?kjop=1500&rente=5.5"),
     );
+    expect(window.location.hash).toBe("");
     expect(screen.getByLabelText("Kommunale kjøp per år")).toHaveValue(1500);
     expect(screen.getByLabelText("Rente")).toHaveValue(5.5);
+  });
+
+  it("opens historical testing from a hash route", () => {
+    window.history.replaceState(null, "", "/bolig-simulator/#/historisk");
+
+    render(<App />);
+
+    expect(
+      screen.getByRole("heading", { name: "Historisk test" }),
+    ).toBeInTheDocument();
   });
 });

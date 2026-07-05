@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   parseAppView,
-  serializeAppViewSearch,
+  serializeAppViewHash,
   type AppView,
 } from "../routing/app-view-url";
 import {
@@ -31,22 +31,22 @@ const getInitialView = (): AppView => {
     return "scenario";
   }
 
-  return parseAppView(window.location.search);
+  return parseAppView(window.location.hash);
 };
 
-const replaceSearch = (search: string) => {
+const replaceUrl = (search: string, hash = "") => {
   window.history.replaceState(
     null,
     "",
-    `${window.location.pathname}${search}${window.location.hash}`,
+    `${window.location.pathname}${search}${hash}`,
   );
 };
 
-const pushSearch = (search: string) => {
+const pushUrl = (search: string, hash = "") => {
   window.history.pushState(
     null,
     "",
-    `${window.location.pathname}${search}${window.location.hash}`,
+    `${window.location.pathname}${search}${hash}`,
   );
 };
 
@@ -66,16 +66,16 @@ export function App() {
     const nextSearch = serializeScenarioSearch(formState);
     lastScenarioSearch.current = nextSearch;
 
-    if (nextSearch === window.location.search) {
+    if (nextSearch === window.location.search && window.location.hash === "") {
       return;
     }
 
-    replaceSearch(nextSearch);
+    replaceUrl(nextSearch);
   }, [activeView, formState]);
 
   useEffect(() => {
-    const onPopState = () => {
-      const nextView = parseAppView(window.location.search);
+    const onLocationChange = () => {
+      const nextView = parseAppView(window.location.hash);
       setActiveView(nextView);
 
       if (nextView === "scenario") {
@@ -85,9 +85,13 @@ export function App() {
       }
     };
 
-    window.addEventListener("popstate", onPopState);
+    window.addEventListener("hashchange", onLocationChange);
+    window.addEventListener("popstate", onLocationChange);
 
-    return () => window.removeEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("hashchange", onLocationChange);
+      window.removeEventListener("popstate", onLocationChange);
+    };
   }, []);
 
   const updateFormValue = (id: keyof ScenarioUrlState, value: number) => {
@@ -108,12 +112,12 @@ export function App() {
 
     if (view === "historical") {
       lastScenarioSearch.current = serializeScenarioSearch(formState);
-      pushSearch(serializeAppViewSearch("historical"));
+      pushUrl("", serializeAppViewHash("historical"));
       setActiveView("historical");
       return;
     }
 
-    pushSearch(lastScenarioSearch.current);
+    pushUrl(lastScenarioSearch.current);
     setActiveView("scenario");
     setFormState(parseScenarioUrlState(lastScenarioSearch.current));
   };
