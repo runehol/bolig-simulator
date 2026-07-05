@@ -156,23 +156,35 @@ outputmål endrer seg på en forklarbar måte.
 
 Mål: gjøre enkle scenarioer stabile og delbare via URL.
 
-- [ ] Opprett `src/routing/`.
-- [ ] Definer korte URL-parametre for første enkle modus.
-- [ ] Implementer parsing fra URL til scenario-input.
-- [ ] Implementer serialisering fra scenario-input til URL.
-- [ ] Bevar ukjente eller ugyldige verdier på en ryddig måte:
+- [x] Opprett `src/routing/`.
+- [x] Definer korte URL-parametre for første enkle modus:
+
+  - `kjop`: kommunale kjøp per år
+  - `salg`: kommunale salg per år
+  - `ikkekomm`: ikke-kommersiell andel av nybygg
+  - `rente`: rente
+  - `vekst`: befolkningsvekst
+  - `kost`: byggekostnadsvekst
+
+- [x] Hold standardverdier implisitte i URL-en, slik at bare brukerendrede
+      scenarioavvik serialiseres.
+- [x] Implementer parsing fra URL til scenario-input.
+- [x] Implementer serialisering fra scenario-input til URL.
+- [x] Bevar ukjente eller ugyldige verdier på en ryddig måte:
 
   - ugyldige tall faller tilbake til standardverdi
   - gamle eller manglende parametre gir et gyldig standardsenario
 
-- [ ] Legg til tester for URL-rundtur:
+- [x] Legg til tester for URL-rundtur:
 
   - scenario til URL til scenario
   - manglende parametre
   - ugyldige parametre
 
 Ferdig når: to brukere kan åpne samme URL og få samme scenario og samme
-modelloutput.
+modelloutput, gitt samme modellversjon. Første korte URL-format er relativt til
+gjeldende standardverdier og er ikke ment som en evig reproduserbar
+modell-snapshot.
 
 ## Milepæl 4: Forklaringer og første grafvisning
 

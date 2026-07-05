@@ -1,8 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { defaultScenarioInputs, modelStart } from "../model/start-values";
 import { simulateScenario } from "../model/simulation";
 import type { ScenarioInputs, SimulationYearResult } from "../model/types";
+import {
+  defaultScenarioUrlState,
+  parseScenarioUrlState,
+  serializeScenarioSearch,
+  type ScenarioUrlState,
+} from "../routing/scenario-url";
 
 type ControlDefinition = {
   id: keyof ScenarioFormState;
@@ -14,14 +20,7 @@ type ControlDefinition = {
   group: "Kommunale grep" | "Eksterne forutsetninger";
 };
 
-type ScenarioFormState = {
-  municipalPurchases: number;
-  municipalSales: number;
-  nonCommercialShareOfNewBuild: number;
-  interestRate: number;
-  householdGrowthRate: number;
-  constructionCostGrowth: number;
-};
+type ScenarioFormState = ScenarioUrlState;
 
 type ChartSeries = {
   key: string;
@@ -87,16 +86,14 @@ const controls: ControlDefinition[] = [
   },
 ];
 
-const initialFormState: ScenarioFormState = {
-  municipalPurchases: defaultScenarioInputs.policies.municipalPurchases,
-  municipalSales: defaultScenarioInputs.policies.municipalSales,
-  nonCommercialShareOfNewBuild:
-    defaultScenarioInputs.policies.nonCommercialShareOfNewBuild * 100,
-  interestRate: defaultScenarioInputs.exogenous.interestRate * 100,
-  householdGrowthRate:
-    defaultScenarioInputs.exogenous.householdGrowthRate * 100,
-  constructionCostGrowth:
-    defaultScenarioInputs.exogenous.constructionCostGrowth * 100,
+const initialFormState: ScenarioFormState = defaultScenarioUrlState;
+
+const getInitialFormState = (): ScenarioFormState => {
+  if (typeof window === "undefined") {
+    return initialFormState;
+  }
+
+  return parseScenarioUrlState(window.location.search);
 };
 
 const numberFormatter = new Intl.NumberFormat("nb-NO", {
@@ -138,6 +135,9 @@ const formatMetricValue = (value: number, decimals = 0) =>
     maximumFractionDigits: decimals,
     minimumFractionDigits: decimals,
   }).format(value);
+
+const formatNumberInputValue = (value: number) =>
+  Number.isInteger(value) ? String(value) : value.toFixed(1);
 
 const normalizeSeries = (values: number[]) => {
   const firstValue = values[0];
@@ -209,6 +209,11 @@ function ScenarioControl({
   onChange: (id: keyof ScenarioFormState, value: number) => void;
 }) {
   const inputId = `control-${definition.id}`;
+  const [draftValue, setDraftValue] = useState(formatNumberInputValue(value));
+
+  useEffect(() => {
+    setDraftValue(formatNumberInputValue(value));
+  }, [value]);
 
   return (
     <div className="grid gap-2 border-b border-[#e5dfd2] py-4 last:border-0">
@@ -240,12 +245,14 @@ function ScenarioControl({
           id={inputId}
           max={definition.max}
           min={definition.min}
-          onChange={(event) =>
-            onChange(definition.id, event.currentTarget.valueAsNumber)
-          }
+          onBlur={() => setDraftValue(formatNumberInputValue(value))}
+          onChange={(event) => {
+            setDraftValue(event.currentTarget.value);
+            onChange(definition.id, event.currentTarget.valueAsNumber);
+          }}
           step={definition.step}
           type="number"
-          value={Number.isInteger(value) ? value : value.toFixed(1)}
+          value={draftValue}
         />
       </div>
       <p className="m-0 text-sm text-[#68746d]">
@@ -389,7 +396,7 @@ function IndexedLineChart({
 
 export function App() {
   const [formState, setFormState] =
-    useState<ScenarioFormState>(initialFormState);
+    useState<ScenarioFormState>(getInitialFormState);
   const scenarioInputs = useMemo(
     () => toScenarioInputs(formState),
     [formState],
@@ -403,6 +410,20 @@ export function App() {
   const chartSeries = buildChartSeries(years);
   const firstYear = years[0];
   const lastYear = years[years.length - 1];
+
+  useEffect(() => {
+    const nextSearch = serializeScenarioSearch(formState);
+
+    if (nextSearch === window.location.search) {
+      return;
+    }
+
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${nextSearch}${window.location.hash}`,
+    );
+  }, [formState]);
 
   const updateFormValue = (id: keyof ScenarioFormState, value: number) => {
     if (!Number.isFinite(value)) {

@@ -1,10 +1,14 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { App } from "./App";
 
 describe("App", () => {
+  beforeEach(() => {
+    window.history.replaceState(null, "", "/bolig-simulator/");
+  });
+
   it("renders the scenario workshop", () => {
     render(<App />);
 
@@ -34,6 +38,25 @@ describe("App", () => {
     await user.type(screen.getByLabelText("Kommunale kjøp per år"), "1500");
 
     expect(summary?.textContent).not.toBe(initialText);
+  });
+
+  it("reads scenario values from the URL", () => {
+    window.history.replaceState(null, "", "/bolig-simulator/?kjop=900");
+
+    render(<App />);
+
+    expect(screen.getByLabelText("Kommunale kjøp per år")).toHaveValue(900);
+  });
+
+  it("writes only changed scenario values to the URL", async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.clear(screen.getByLabelText("Kommunale kjøp per år"));
+    await user.type(screen.getByLabelText("Kommunale kjøp per år"), "1500");
+
+    expect(window.location.search).toBe("?kjop=1500");
   });
 
   it("updates non-commercial stock when the new-build share changes", async () => {

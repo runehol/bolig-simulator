@@ -12,9 +12,9 @@ Stacken følger designnotatet:
 - GitHub Pages og GitHub Actions for første deploy
 
 Første scenarioverksted kjører en deterministisk modell i nettleseren, med
-slidere, nummerfelt, normalisert tidsseriegraf og tabell med faktiske verdier.
-ECharts, MapLibre GL JS og en Web Worker kan legges til når visnings- og
-simuleringsbehovene blir mer avanserte.
+slidere, nummerfelt, normalisert tidsseriegraf, tabell med faktiske verdier og
+korte delbare scenario-URL-er. Standardverdier er implisitte i URL-en, slik at
+bare scenarioavvik skrives til adressefeltet.
 
 ## Kom i gang
 
@@ -53,6 +53,7 @@ npm run format
 ```text
 src/
   model/       simuleringslogikk, startverdier og modelltester
+  routing/     parsing og serialisering av delbare scenario-URL-er
   test/        felles testoppsett
   ui/          React-komponenter
   main.tsx     React-entrypoint
