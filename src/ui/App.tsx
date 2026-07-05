@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
+import {
+  compareHistoricalBacktest,
+  historicalModelStart,
+} from "../model/historical-scenario";
 import { defaultScenarioInputs, modelStart } from "../model/start-values";
 import { simulateScenario } from "../model/simulation";
 import type {
@@ -28,6 +32,7 @@ type ControlDefinition = {
 type ScenarioFormState = ScenarioUrlState;
 
 type ChartSeries = ScenarioChartSeries;
+type AppView = "scenario" | "historical";
 
 const controls: ControlDefinition[] = [
   {
@@ -243,6 +248,73 @@ const buildHousingChangeSeries = (
   },
 ];
 
+const calculateMeanAbsoluteError = (values: Array<number | undefined>) => {
+  const numericValues = values.filter((value) => value !== undefined);
+
+  if (numericValues.length === 0) {
+    return undefined;
+  }
+
+  return (
+    numericValues.reduce((sum, value) => sum + Math.abs(value), 0) /
+    numericValues.length
+  );
+};
+
+const calculateMeanAbsolutePercentError = (
+  values: Array<{ error: number | undefined; observed: number | undefined }>,
+) => {
+  const numericValues = values.filter(
+    (value) => value.error !== undefined && value.observed !== undefined,
+  );
+
+  if (numericValues.length === 0) {
+    return undefined;
+  }
+
+  return (
+    numericValues.reduce(
+      (sum, value) => sum + Math.abs(value.error ?? 0) / (value.observed ?? 1),
+      0,
+    ) *
+    (100 / numericValues.length)
+  );
+};
+
+const buildHistoricalHousingStockSeries = (
+  rows: ReturnType<typeof compareHistoricalBacktest>,
+): ChartSeries[] => [
+  {
+    key: "modeledTotalHousingStock",
+    label: "Modellert boligbestand",
+    color: "#365f91",
+    values: rows.map((row) => row.modeledTotalHousingStock),
+  },
+  {
+    key: "observedTotalHousingStock",
+    label: "Observert boligbestand",
+    color: "#b13f2d",
+    values: rows.map((row) => row.observedTotalHousingStock ?? 0),
+  },
+];
+
+const buildHistoricalCompletedSeries = (
+  rows: ReturnType<typeof compareHistoricalBacktest>,
+): ChartSeries[] => [
+  {
+    key: "modeledCompletedDwellings",
+    label: "Modellert ferdigstilt",
+    color: "#365f91",
+    values: rows.map((row) => row.modeledCompletedDwellings),
+  },
+  {
+    key: "observedCompletedDwellings",
+    label: "Observert ferdigstilt",
+    color: "#b13f2d",
+    values: rows.map((row) => row.observedCompletedDwellings ?? 0),
+  },
+];
+
 function ScenarioControl({
   definition,
   value,
@@ -309,6 +381,7 @@ function ScenarioControl({
 function ChartPanel({
   ariaLabel,
   children,
+  periodLabel,
   referenceValue,
   series,
   title,
@@ -317,6 +390,7 @@ function ChartPanel({
 }: {
   ariaLabel: string;
   children: ReactNode;
+  periodLabel: string;
   referenceValue?: number;
   series: ChartSeries[];
   title: string;
@@ -331,7 +405,7 @@ function ChartPanel({
           <div className="m-0 mt-1 text-sm text-[#68746d]">{children}</div>
         </div>
         <p className="m-0 text-sm font-semibold text-[#435048]">
-          {modelStart.startYear}-{modelStart.endYear}
+          {periodLabel}
         </p>
       </div>
 
@@ -365,6 +439,40 @@ function ChartPanel({
   );
 }
 
+function AppTabs({
+  activeView,
+  onChange,
+}: {
+  activeView: AppView;
+  onChange: (view: AppView) => void;
+}) {
+  return (
+    <nav aria-label="Hovedvisning" className="mb-8 border-b border-[#ddd8cd]">
+      <div className="flex gap-2" role="tablist">
+        {[
+          { id: "scenario" as const, label: "Simulator" },
+          { id: "historical" as const, label: "Historisk test" },
+        ].map((tab) => (
+          <button
+            aria-selected={activeView === tab.id}
+            className={`border-b-2 px-4 py-3 text-sm font-semibold ${
+              activeView === tab.id
+                ? "border-[#b13f2d] text-[#17211c]"
+                : "border-transparent text-[#68746d]"
+            }`}
+            key={tab.id}
+            onClick={() => onChange(tab.id)}
+            role="tab"
+            type="button"
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
 function SummaryCard({
   explanation,
   label,
@@ -383,7 +491,365 @@ function SummaryCard({
   );
 }
 
+function HistoricalBacktestView() {
+  const comparisonRows = useMemo(() => compareHistoricalBacktest(), []);
+  const chartYears = comparisonRows.map((row) => row.year);
+  const housingStockSeries = buildHistoricalHousingStockSeries(comparisonRows);
+  const completedSeries = buildHistoricalCompletedSeries(comparisonRows);
+  const stockMae = calculateMeanAbsoluteError(
+    comparisonRows.map((row) => row.totalHousingStockError),
+  );
+  const stockMape = calculateMeanAbsolutePercentError(
+    comparisonRows.map((row) => ({
+      error: row.totalHousingStockError,
+      observed: row.observedTotalHousingStock,
+    })),
+  );
+  const completedMae = calculateMeanAbsoluteError(
+    comparisonRows.map((row) => row.completedDwellingsError),
+  );
+  const completedMape = calculateMeanAbsolutePercentError(
+    comparisonRows.map((row) => ({
+      error: row.completedDwellingsError,
+      observed: row.observedCompletedDwellings,
+    })),
+  );
+  const periodLabel = `${historicalModelStart.startYear}-${historicalModelStart.endYear}`;
+
+  return (
+    <section className="grid gap-6">
+      <div>
+        <h2 className="m-0 text-2xl font-semibold">Historisk test</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-[#435048]">
+          Første backtest kjører modellen for {periodLabel} med observerte
+          igangsettinger og historisk styringsrente. Den tester foreløpig
+          pipeline, ferdigstillelser og boligbestand før vi kalibrerer
+          utbyggerresponsen.
+        </p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard
+          explanation="Gjennomsnittlig absolutt årsavvik mellom modellert og observert total boligbestand."
+          label="Boligbestand MAE"
+          value={stockMae === undefined ? "-" : formatMetricValue(stockMae)}
+        />
+        <SummaryCard
+          explanation="Gjennomsnittlig absolutt prosentavvik for total boligbestand."
+          label="Boligbestand MAPE"
+          value={
+            stockMape === undefined
+              ? "-"
+              : `${formatMetricValue(stockMape, 1)} %`
+          }
+        />
+        <SummaryCard
+          explanation="Gjennomsnittlig absolutt årsavvik mellom modellert og observert ferdigstillelse."
+          label="Ferdigstilt MAE"
+          value={
+            completedMae === undefined ? "-" : formatMetricValue(completedMae)
+          }
+        />
+        <SummaryCard
+          explanation="Gjennomsnittlig absolutt prosentavvik for ferdigstilte boliger."
+          label="Ferdigstilt MAPE"
+          value={
+            completedMape === undefined
+              ? "-"
+              : `${formatMetricValue(completedMape, 1)} %`
+          }
+        />
+      </div>
+
+      <ChartPanel
+        ariaLabel="Historisk test av total boligbestand"
+        periodLabel={periodLabel}
+        series={housingStockSeries}
+        title="Total boligbestand"
+        years={chartYears}
+      >
+        Modellert boligbestand sammenlignet med observert SSB-serie.
+      </ChartPanel>
+
+      <ChartPanel
+        ariaLabel="Historisk test av ferdigstilte boliger"
+        periodLabel={periodLabel}
+        series={completedSeries}
+        title="Ferdigstilte boliger"
+        valueFloor={0}
+        years={chartYears}
+      >
+        Ferdigstillelser fra modellen sammenlignet med observerte ferdigstilte
+        boliger.
+      </ChartPanel>
+
+      <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+        <h2 className="m-0 text-xl font-semibold">Avvikstabell</h2>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-[#ddd8cd] text-[#68746d]">
+                <th className="py-2 pr-4 font-semibold">År</th>
+                <th className="py-2 pr-4 font-semibold">Modellert bestand</th>
+                <th className="py-2 pr-4 font-semibold">Observert bestand</th>
+                <th className="py-2 pr-4 font-semibold">Avvik bestand</th>
+                <th className="py-2 pr-4 font-semibold">
+                  Modellert ferdigstilt
+                </th>
+                <th className="py-2 pr-4 font-semibold">
+                  Observert ferdigstilt
+                </th>
+                <th className="py-2 pr-4 font-semibold">Avvik ferdigstilt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comparisonRows.map((row) => (
+                <tr
+                  className="border-b border-[#eee8dd] last:border-0"
+                  key={row.year}
+                >
+                  <td className="py-2 pr-4 font-semibold">{row.year}</td>
+                  <td className="py-2 pr-4">
+                    {formatMetricValue(row.modeledTotalHousingStock)}
+                  </td>
+                  <td className="py-2 pr-4">
+                    {row.observedTotalHousingStock === undefined
+                      ? "-"
+                      : formatMetricValue(row.observedTotalHousingStock)}
+                  </td>
+                  <td className="py-2 pr-4">
+                    {row.totalHousingStockError === undefined
+                      ? "-"
+                      : formatMetricValue(row.totalHousingStockError)}
+                  </td>
+                  <td className="py-2 pr-4">
+                    {formatMetricValue(row.modeledCompletedDwellings)}
+                  </td>
+                  <td className="py-2 pr-4">
+                    {row.observedCompletedDwellings === undefined
+                      ? "-"
+                      : formatMetricValue(row.observedCompletedDwellings)}
+                  </td>
+                  <td className="py-2 pr-4">
+                    {row.completedDwellingsError === undefined
+                      ? "-"
+                      : formatMetricValue(row.completedDwellingsError)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function ScenarioWorkshopView({
+  formState,
+  housingChangeSeries,
+  housingStockSeries,
+  indicatorSeries,
+  lastYear,
+  firstYear,
+  updateFormValue,
+  years,
+}: {
+  firstYear: SimulationYearResult;
+  formState: ScenarioFormState;
+  housingChangeSeries: ChartSeries[];
+  housingStockSeries: ChartSeries[];
+  indicatorSeries: ChartSeries[];
+  lastYear: SimulationYearResult;
+  updateFormValue: (id: keyof ScenarioFormState, value: number) => void;
+  years: SimulationYearResult[];
+}) {
+  const chartYears = years.map((year) => year.year);
+  const periodLabel = `${modelStart.startYear}-${modelStart.endYear}`;
+
+  return (
+    <div className="grid gap-6 xl:grid-cols-[23rem_1fr]">
+      <aside className="self-start rounded-lg border border-[#ddd8cd] bg-white p-5">
+        <h2 className="m-0 text-xl font-semibold">Scenario</h2>
+        <p className="mt-2 text-sm text-[#68746d]">
+          Slidere gir rask utforsking. Nummerfeltene kan brukes for presise
+          verdier.
+        </p>
+
+        {controlGroups.map((group) => {
+          const groupControls = controls.filter(
+            (control) => control.group === group.id,
+          );
+
+          return (
+            <section className="mt-6" key={group.id}>
+              <h3 className="m-0 text-sm font-bold text-[#435048] uppercase">
+                {group.id}
+              </h3>
+              <p className="mt-1 text-sm leading-snug text-[#68746d]">
+                {group.description}
+              </p>
+              <div className="mt-2">
+                {groupControls.length === 0 ? (
+                  <p className="m-0 rounded-md border border-dashed border-[#cfc7b8] bg-[#fbf8f1] p-3 text-sm text-[#68746d]">
+                    Ingen aktiv kontroll i første prototype.
+                  </p>
+                ) : (
+                  groupControls.map((control) => (
+                    <ScenarioControl
+                      definition={control}
+                      key={control.id}
+                      onChange={updateFormValue}
+                      value={formState[control.id]}
+                    />
+                  ))
+                )}
+              </div>
+            </section>
+          );
+        })}
+      </aside>
+
+      <section className="grid gap-6">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <SummaryCard
+            explanation="Kommunalt disponerte boliger etter kjøp, salg og modellert beholdningsendring."
+            label="Kommunale boliger"
+            value={`${formatMetricValue(firstYear.state.housingStock.municipal)} -> ${formatMetricValue(lastYear.state.housingStock.municipal)}`}
+          />
+          <SummaryCard
+            explanation="Boliger utenfor ordinær kommersiell eier- og leiemodell, bygget opp gjennom nybyggandelen."
+            label="Ikke-kommersielle"
+            value={`${formatMetricValue(firstYear.state.housingStock.nonCommercial)} -> ${formatMetricValue(lastYear.state.housingStock.nonCommercial)}`}
+          />
+          <SummaryCard
+            explanation="Modellert prisnivå der 100 er startnivået. Brukes foreløpig som driver for privat bygging."
+            label="Boligprisindeks"
+            value={`${formatMetricValue(firstYear.state.housingPriceIndex, 1)} -> ${formatMetricValue(lastYear.state.housingPriceIndex, 1)}`}
+          />
+          <SummaryCard
+            explanation="Indikator for press i privat leiemarked. Høyere verdi betyr strammere marked i modellen."
+            label="Privat leiepress"
+            value={`${formatMetricValue(firstYear.privateRentalPressure, 2)} -> ${formatMetricValue(lastYear.privateRentalPressure, 2)}`}
+          />
+        </div>
+
+        <ChartPanel
+          ariaLabel="Indekserte indikatorer for scenarioet"
+          periodLabel={periodLabel}
+          referenceValue={100}
+          series={indicatorSeries}
+          title="Indikatorer"
+          valueFloor={95}
+          years={chartYears}
+        >
+          Boligprisindeks og privat leiepress er indeksert til 100 i første
+          modellår.
+        </ChartPanel>
+
+        <ChartPanel
+          ariaLabel="Boligbestand for scenarioet"
+          periodLabel={periodLabel}
+          series={housingStockSeries}
+          title="Boligbestand"
+          valueFloor={0}
+          years={chartYears}
+        >
+          Faktiske beholdninger etter disposisjonsform og total boligbestand.
+        </ChartPanel>
+
+        <ChartPanel
+          ariaLabel="Boligendringer for scenarioet"
+          periodLabel={periodLabel}
+          series={housingChangeSeries}
+          title="Boligendringer"
+          valueFloor={0}
+          years={chartYears}
+        >
+          Faktiske årlige strømmer for igangsatte og ferdigstilte boliger.
+        </ChartPanel>
+
+        <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+          <div className="grid gap-3 text-sm leading-snug text-[#435048] md:grid-cols-2">
+            <p className="m-0">
+              Indikatorer vises som indeks for å gjøre utviklingen
+              sammenlignbar. Boligbestand og boligendringer vises som faktiske
+              modellverdier.
+            </p>
+            <p className="m-0">
+              Første prototype bruker grove startverdier og ukalibrerte regler.
+              Tabellen under viser samme verdier år for år.
+            </p>
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
+          <h2 className="m-0 text-xl font-semibold">Årstabell</h2>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[760px] border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-[#ddd8cd] text-[#68746d]">
+                  <th className="py-2 pr-4 font-semibold">År</th>
+                  <th className="py-2 pr-4 font-semibold">Total</th>
+                  <th className="py-2 pr-4 font-semibold">Kommunal</th>
+                  <th className="py-2 pr-4 font-semibold">Selveid</th>
+                  <th className="py-2 pr-4 font-semibold">Privatleid</th>
+                  <th className="py-2 pr-4 font-semibold">Ikke-kommersiell</th>
+                  <th className="py-2 pr-4 font-semibold">Prisindeks</th>
+                  <th className="py-2 pr-4 font-semibold">Leiepress</th>
+                  <th className="py-2 pr-4 font-semibold">Igangsatt</th>
+                  <th className="py-2 pr-4 font-semibold">Ferdigstilt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {years.map((year) => (
+                  <tr
+                    className="border-b border-[#eee8dd] last:border-0"
+                    key={year.year}
+                  >
+                    <td className="py-2 pr-4 font-semibold">{year.year}</td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(
+                        totalHousingStock(year.state.housingStock),
+                      )}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(year.state.housingStock.municipal)}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(year.state.housingStock.ownerOccupied)}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(year.state.housingStock.privateRental)}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(year.state.housingStock.nonCommercial)}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(year.state.housingPriceIndex, 1)}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(year.privateRentalPressure, 2)}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(year.startedDwellings)}
+                    </td>
+                    <td className="py-2 pr-4">
+                      {formatMetricValue(year.completedDwellings)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </div>
+  );
+}
+
 export function App() {
+  const [activeView, setActiveView] = useState<AppView>("scenario");
   const [formState, setFormState] =
     useState<ScenarioFormState>(getInitialFormState);
   const scenarioInputs = useMemo(
@@ -395,7 +861,6 @@ export function App() {
     [scenarioInputs],
   );
   const years = simulation.years;
-  const chartYears = years.map((year) => year.year);
   const indicatorSeries = buildIndicatorSeries(years);
   const housingStockSeries = buildHousingStockSeries(years);
   const housingChangeSeries = buildHousingChangeSeries(years);
@@ -445,188 +910,22 @@ export function App() {
         </p>
       </header>
 
-      <div className="grid gap-6 xl:grid-cols-[23rem_1fr]">
-        <aside className="self-start rounded-lg border border-[#ddd8cd] bg-white p-5">
-          <h2 className="m-0 text-xl font-semibold">Scenario</h2>
-          <p className="mt-2 text-sm text-[#68746d]">
-            Slidere gir rask utforsking. Nummerfeltene kan brukes for presise
-            verdier.
-          </p>
+      <AppTabs activeView={activeView} onChange={setActiveView} />
 
-          {controlGroups.map((group) => {
-            const groupControls = controls.filter(
-              (control) => control.group === group.id,
-            );
-
-            return (
-              <section className="mt-6" key={group.id}>
-                <h3 className="m-0 text-sm font-bold text-[#435048] uppercase">
-                  {group.id}
-                </h3>
-                <p className="mt-1 text-sm leading-snug text-[#68746d]">
-                  {group.description}
-                </p>
-                <div className="mt-2">
-                  {groupControls.length === 0 ? (
-                    <p className="m-0 rounded-md border border-dashed border-[#cfc7b8] bg-[#fbf8f1] p-3 text-sm text-[#68746d]">
-                      Ingen aktiv kontroll i første prototype.
-                    </p>
-                  ) : (
-                    groupControls.map((control) => (
-                      <ScenarioControl
-                        definition={control}
-                        key={control.id}
-                        onChange={updateFormValue}
-                        value={formState[control.id]}
-                      />
-                    ))
-                  )}
-                </div>
-              </section>
-            );
-          })}
-        </aside>
-
-        <section className="grid gap-6">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <SummaryCard
-              explanation="Kommunalt disponerte boliger etter kjøp, salg og modellert beholdningsendring."
-              label="Kommunale boliger"
-              value={`${formatMetricValue(firstYear.state.housingStock.municipal)} -> ${formatMetricValue(lastYear.state.housingStock.municipal)}`}
-            />
-            <SummaryCard
-              explanation="Boliger utenfor ordinær kommersiell eier- og leiemodell, bygget opp gjennom nybyggandelen."
-              label="Ikke-kommersielle"
-              value={`${formatMetricValue(firstYear.state.housingStock.nonCommercial)} -> ${formatMetricValue(lastYear.state.housingStock.nonCommercial)}`}
-            />
-            <SummaryCard
-              explanation="Modellert prisnivå der 100 er startnivået. Brukes foreløpig som driver for privat bygging."
-              label="Boligprisindeks"
-              value={`${formatMetricValue(firstYear.state.housingPriceIndex, 1)} -> ${formatMetricValue(lastYear.state.housingPriceIndex, 1)}`}
-            />
-            <SummaryCard
-              explanation="Indikator for press i privat leiemarked. Høyere verdi betyr strammere marked i modellen."
-              label="Privat leiepress"
-              value={`${formatMetricValue(firstYear.privateRentalPressure, 2)} -> ${formatMetricValue(lastYear.privateRentalPressure, 2)}`}
-            />
-          </div>
-
-          <ChartPanel
-            ariaLabel="Indekserte indikatorer for scenarioet"
-            referenceValue={100}
-            series={indicatorSeries}
-            title="Indikatorer"
-            valueFloor={95}
-            years={chartYears}
-          >
-            Boligprisindeks og privat leiepress er indeksert til 100 i første
-            modellår.
-          </ChartPanel>
-
-          <ChartPanel
-            ariaLabel="Boligbestand for scenarioet"
-            series={housingStockSeries}
-            title="Boligbestand"
-            valueFloor={0}
-            years={chartYears}
-          >
-            Faktiske beholdninger etter disposisjonsform og total boligbestand.
-          </ChartPanel>
-
-          <ChartPanel
-            ariaLabel="Boligendringer for scenarioet"
-            series={housingChangeSeries}
-            title="Boligendringer"
-            valueFloor={0}
-            years={chartYears}
-          >
-            Faktiske årlige strømmer for igangsatte og ferdigstilte boliger.
-          </ChartPanel>
-
-          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
-            <div className="grid gap-3 text-sm leading-snug text-[#435048] md:grid-cols-2">
-              <p className="m-0">
-                Indikatorer vises som indeks for å gjøre utviklingen
-                sammenlignbar. Boligbestand og boligendringer vises som faktiske
-                modellverdier.
-              </p>
-              <p className="m-0">
-                Første prototype bruker grove startverdier og ukalibrerte
-                regler. Tabellen under viser samme verdier år for år.
-              </p>
-            </div>
-          </section>
-
-          <section className="rounded-lg border border-[#ddd8cd] bg-white p-5">
-            <h2 className="m-0 text-xl font-semibold">Årstabell</h2>
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[760px] border-collapse text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[#ddd8cd] text-[#68746d]">
-                    <th className="py-2 pr-4 font-semibold">År</th>
-                    <th className="py-2 pr-4 font-semibold">Total</th>
-                    <th className="py-2 pr-4 font-semibold">Kommunal</th>
-                    <th className="py-2 pr-4 font-semibold">Selveid</th>
-                    <th className="py-2 pr-4 font-semibold">Privatleid</th>
-                    <th className="py-2 pr-4 font-semibold">
-                      Ikke-kommersiell
-                    </th>
-                    <th className="py-2 pr-4 font-semibold">Prisindeks</th>
-                    <th className="py-2 pr-4 font-semibold">Leiepress</th>
-                    <th className="py-2 pr-4 font-semibold">Igangsatt</th>
-                    <th className="py-2 pr-4 font-semibold">Ferdigstilt</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {years.map((year) => (
-                    <tr
-                      className="border-b border-[#eee8dd] last:border-0"
-                      key={year.year}
-                    >
-                      <td className="py-2 pr-4 font-semibold">{year.year}</td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(
-                          totalHousingStock(year.state.housingStock),
-                        )}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(year.state.housingStock.municipal)}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(
-                          year.state.housingStock.ownerOccupied,
-                        )}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(
-                          year.state.housingStock.privateRental,
-                        )}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(
-                          year.state.housingStock.nonCommercial,
-                        )}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(year.state.housingPriceIndex, 1)}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(year.privateRentalPressure, 2)}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(year.startedDwellings)}
-                      </td>
-                      <td className="py-2 pr-4">
-                        {formatMetricValue(year.completedDwellings)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </section>
-      </div>
+      {activeView === "scenario" ? (
+        <ScenarioWorkshopView
+          firstYear={firstYear}
+          formState={formState}
+          housingChangeSeries={housingChangeSeries}
+          housingStockSeries={housingStockSeries}
+          indicatorSeries={indicatorSeries}
+          lastYear={lastYear}
+          updateFormValue={updateFormValue}
+          years={years}
+        />
+      ) : (
+        <HistoricalBacktestView />
+      )}
     </main>
   );
 }

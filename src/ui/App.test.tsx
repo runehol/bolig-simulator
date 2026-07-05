@@ -129,4 +129,31 @@ describe("App", () => {
 
     expect(rowAfter).not.toBe(rowBefore);
   });
+
+  it("shows historical backtest as a top-level tab", async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.click(screen.getByRole("tab", { name: "Historisk test" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Historisk test" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "Historisk test av total boligbestand",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "Historisk test av ferdigstilte boliger",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Boligbestand MAE")).toBeInTheDocument();
+    expect(screen.getByText("Ferdigstilt MAPE")).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Avvik bestand" }),
+    ).toBeInTheDocument();
+  });
 });
