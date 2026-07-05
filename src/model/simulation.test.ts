@@ -45,6 +45,33 @@ describe("simulateScenario", () => {
     expect(timeline.exogenous[2040]).toEqual(defaultScenarioInputs.exogenous);
     expect(Object.keys(timeline.policies)).toHaveLength(14);
   });
+
+  it("does not create more total housing when municipal purchases are higher", () => {
+    const withoutPurchases = simulateScenario({
+      inputs: {
+        ...defaultScenarioInputs,
+        policies: {
+          ...defaultScenarioInputs.policies,
+          municipalPurchases: 0,
+        },
+      },
+    });
+    const withHighPurchases = simulateScenario({
+      inputs: {
+        ...defaultScenarioInputs,
+        policies: {
+          ...defaultScenarioInputs.policies,
+          municipalPurchases: 2_000,
+        },
+      },
+    });
+
+    expect(
+      withHighPurchases.years.map((year) => totalHousingStock(year.state)),
+    ).toEqual(
+      withoutPurchases.years.map((year) => totalHousingStock(year.state)),
+    );
+  });
 });
 
 describe("simulateOneYear", () => {

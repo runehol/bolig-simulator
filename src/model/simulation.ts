@@ -63,6 +63,16 @@ const calculatePrivateRentalPressure = (state: ModelState) => {
   return renterHouseholds / Math.max(1, state.housingStock.privateRental);
 };
 
+const calculateTotalHousingPressure = (state: ModelState) => {
+  const totalHouseholds =
+    state.households.lowIncomeRenters +
+    state.households.otherRenters +
+    state.households.ownerHouseholds;
+  const totalHousingStock = sumHousingStock(state.housingStock);
+
+  return totalHouseholds / Math.max(1, totalHousingStock);
+};
+
 const calculateHousingPriceIndex = (
   state: ModelState,
   exogenous: ExogenousInputs,
@@ -71,8 +81,8 @@ const calculateHousingPriceIndex = (
 ) => {
   const totalHousingStock = sumHousingStock(state.housingStock);
   const supplyRelief = completedDwellings / Math.max(1, totalHousingStock);
-  const privateRentalPressure = calculatePrivateRentalPressure(state);
-  const demandPressure = Math.max(0, privateRentalPressure - 1);
+  const totalHousingPressure = calculateTotalHousingPressure(state);
+  const demandPressure = Math.max(0, totalHousingPressure - 1);
   const priceGrowth =
     parameters.demandPressurePriceWeight * demandPressure +
     exogenous.householdGrowthRate -
