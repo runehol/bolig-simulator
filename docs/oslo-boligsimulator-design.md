@@ -5,6 +5,34 @@ boligpolitikk i Oslo. Formålet er ikke primært å spå boligpris i et bestemt 
 men å gjøre det mulig å teste politiske grep, vise mekanismer og sammenligne
 fordelingsvirkninger over tid.
 
+## Status per første implementasjon
+
+Første appskjelett er bygget som en statisk Vite/React/TypeScript-app med
+Tailwind CSS. Den har to visninger:
+
+- scenarioverksted for framtidsscenarioer
+- historisk test for en enkel backtest mot observerte Oslo-serier
+
+Første modell er en årlig stock-flow-modell for hele Oslo, ikke en bydelsmodell.
+Den kjører framtidsscenarioer fra 2027 til 2040 og historisk test fra 2015
+til 2025. Modellen har foreløpig grove, utskiftbare startverdier og skal brukes
+til å teste struktur og mekanismer før offentlig kalibrering.
+
+Dette er bygget så langt:
+
+- simuleringslogikk ligger under `src/model/`
+- observerte Oslo-serier ligger i `src/data/observed-oslo.ts`
+- scenario-URL-logikk ligger under `src/routing/`
+- UI-komponenter og visninger ligger under `src/ui/`
+- scenarioer kan deles med korte URL-parametre
+- historisk test sammenligner modellert boligbestand og ferdigstilling med
+  observerte serier
+
+Det som fortsatt er produkt- og modellretning, ikke implementert kjerne, er
+blant annet bydel/delbydel, kartvisning, full historisk what-if, avansert
+år-for-år-scenario, geografisk fordeling, kommunal økonomi og mer detaljerte
+husholdningsflyter.
+
 ## Formål
 
 Simulatoren skal gjøre det mulig å spørre:
@@ -50,10 +78,25 @@ scenario.
 Eksempel på enkel URL:
 
 ```text
-/scenario?start=2027&kjop=500&ikkekomm=25&rente=4.5
+/bolig-simulator/?kjop=500&ikkekomm=25&rente=4.5
 ```
 
-Eksempel på historisk what-if:
+Den implementerte førsteversjonen støtter disse korte parameterne:
+
+- `kjop`: kommunale kjøp per år
+- `salg`: kommunale salg per år
+- `ikkekomm`: ikke-kommersiell andel av nybygg i prosent
+- `rente`: rente i prosent
+- `vekst`: husholdnings- eller befolkningsvekst i prosent
+- `kost`: byggekostnadsvekst i prosent
+
+Historisk test ligger foreløpig som egen visning:
+
+```text
+/bolig-simulator/#/historisk
+```
+
+Eksempel på senere historisk what-if:
 
 ```text
 /scenario?start=2015&baseline=historisk&kjop=500&ikkekomm=20
@@ -88,80 +131,24 @@ Avansert modus:
 Første offentlige versjon bør være enkel modus, men datamodellen bør støtte
 avansert modus fra starten.
 
-### Spillmekanikk uten vinnertilstand
+## Teknisk ramme
 
-Simulatoren kan gjerne hente mekanikker fra serious games og policy
-sandbox-verktøy, men bør ikke presenteres som et spill der brukeren "vinner"
-boligkrisen. Boligkrisen er et politisk og sosialt problem med målkonflikter,
-treghet og fordelingsvirkninger. Produktet bør derfor bruke spill-lignende
-interaksjon for å gjøre systemdynamikken forståelig, ikke for å late som
-problemet har en enkel optimal løsning.
+Simulatoren er en statisk Vite/React/TypeScript-app med Tailwind CSS, Vitest og
+GitHub Pages-oppsett. Modellkjøring skjer i nettleseren, uten backend eller
+brukerkontoer. Scenario-tilstand skal ligge i URL-en.
 
-Aktuelle mekanikker:
+Planlagt visualiseringsretning er Apache ECharts for grafer og MapLibre GL JS
+for kart når geografivisning innføres.
 
-- runder eller år, der hvert år gir nye effekter på bygging, flytting,
-  boligbehov, kommunal økonomi og leiepress
-- begrensede ressurser som budsjett, tomter, administrativ kapasitet og politisk
-  handlingsrom
-- målkonflikter mellom rask boligbygging, kommunal risiko, geografisk fordeling,
-  arealbruk, klima og sosial treffsikkerhet
-- hendelser eller eksterne sjokk som renteøkning, byggekostnadshopp,
-  Husbanken-kutt eller svakere privat igangsetting
-- scenariohistorikk som viser hvilke valg som skapte hvilke resultater
-- sammenligning mellom brukerens scenario, historisk utvikling og nullalternativ
-- delbare scenarioer uten brukerkonto
+Bibliotekvalg, utviklingskommandoer og deploy-oppsett dokumenteres i README,
+`package.json`, `vite.config.ts` og GitHub Actions-filene. Dette
+designdokumentet bør bare beskrive produkt- og modellkonsekvensene av valgene.
 
-Produktet bør ha indikatorer, ikke en enkel vinnertilstand. Relevante
-indikatorer kan være:
+Grafvisning bør være hovedvisningen for utvikling over tid. Geografisk visning
+bør først inn når romlig fordeling er selve poenget, og kart bør ikke erstatte
+grafer for tidsserier eller totalsammenligninger.
 
-- husholdninger i utrygg privat leie
-- husholdninger med høy boutgiftsbelastning
-- udekket kommunalt boligbehov
-- ikke-kommersiell boligbestand
-- privat igangsetting og ferdigstilling
-- geografisk konsentrasjon av kommunale og ikke-kommersielle boliger
-- kommunal kapitalbinding og årlig budsjettbelastning
-
-Språk og visuell retning bør derfor ligge nær "boligpolitisk verksted" eller
-"scenarioverksted", ikke "redd byen"-spill. Det kan være engasjerende og
-utforskende, men må bevare faglig alvor og vise usikkerhet tydelig.
-
-## Teknologivalg
-
-### Anbefalt stack
-
-- TypeScript for simuleringsmotor og datamodell
-- React for brukergrensesnitt
-- Vite for lokal utvikling og statisk bygg
-- GitHub Pages for første deploy
-- GitHub Actions for automatisk bygg og publisering
-- JSON eller CSV for baseline-data og scenarioforutsetninger
-- Web Worker hvis simuleringen etter hvert blir tung nok til å påvirke
-  brukergrensesnittet
-
-### Begrunnelse
-
-Dette bør være en statisk webapp i første versjon. All modellkjøring skjer i
-nettleseren. Det gir:
-
-- enkel deploy
-- ingen serverdrift
-- ingen brukerkontoer
-- enkel deling
-- lav sikkerhetsrisiko
-- full reproduserbarhet så lenge data og modellversjon er kjent
-
-GitHub Pages passer fordi appen kan bygges til statiske filer. Hvis prosjektet
-senere trenger innlogging, database, scenarioarkiv, serverberegning eller
-API-nøkler, kan det vurderes å flytte til Vercel, Netlify, Cloudflare Pages
-eller en enkel backend.
-
-### Visualisering og bibliotekvalg
-
-Simulatoren bør ha både grafvisning og geografisk visning, men de skal ikke
-gjøre samme jobb.
-
-Grafvisning bør være hovedvisningen for utvikling over tid:
+Relevante grafserier:
 
 - boligprisindeks eller kvadratmeterpris over tid
 - boligbestand over tid
@@ -171,7 +158,7 @@ Grafvisning bør være hovedvisningen for utvikling over tid:
 - boutgiftsbelastning
 - forskjell mellom scenario og nullalternativ
 
-Geografisk visning bør brukes når romlig fordeling er selve poenget:
+Relevante kart- eller geografivisninger senere:
 
 - huspris per bydel eller delbydel
 - kommunale boliger som andel av boligbestand
@@ -180,38 +167,7 @@ Geografisk visning bør brukes når romlig fordeling er selve poenget:
 - regulert kapasitet og større utbyggingsområder
 - forskjell mellom gammel og ny bydelsstruktur
 
-Kart bør ikke erstatte grafer. For eksempel er "boligbestand over tid" ofte best
-som linje, stablet areal eller små multiples. Kart er best for å vise hvor
-presset, investeringene eller boligtypene ligger.
-
-Anbefalt førstevalg:
-
-- Apache ECharts for vanlige grafer, fordi det dekker mange diagramtyper, har
-  Canvas/SVG-rendering, datasett/transformasjoner og innebygd støtte for
-  responsivitet og tilgjengelighetsfunksjoner.
-- MapLibre GL JS for geografisk visning, fordi det kan vise GeoJSON-polygonger,
-  vektorlag, popups, tidslider og interaktive kart uten Mapbox-lisensbinding.
-- deck.gl som senere tillegg hvis vi får store punkt-/polygonmengder, tunge lag,
-  mange scenarioer eller behov for mer avansert WebGL-basert kartvisualisering.
-
-Mulige alternativer:
-
-- Recharts hvis vi vil ha veldig enkle React-grafer raskt, men det kan bli
-  trangt for avansert interaksjon.
-- visx hvis vi vil ha maksimal designkontroll, men da må vi bygge mer selv.
-- Vega-Lite hvis vi vil ha deklarative, forskningsnære grafspesifikasjoner som
-  ligner mer på grammar-of-graphics-tenkning, men det kan bli tyngre å tilpasse
-  til et polert app-UI.
-
-Første prototype bør derfor bruke:
-
-```text
-Apache ECharts + MapLibre GL JS
-```
-
-og bare legge til deck.gl hvis MapLibre alene blir for begrensende.
-
-Viktig designregel:
+Viktige designregler:
 
 - bruk både absolutte tall og rater der det trengs
 - merk usikre/imputerte geografiske tall tydelig
@@ -220,33 +176,6 @@ Viktig designregel:
 - la brukeren klikke på et område i kartet og få samme område markert i grafene
 - la brukeren velge variabel, år og geografi i samme kontrollflate
 
-### Foreslått kodestruktur
-
-```text
-src/
-  model/
-    types.ts
-    initial-state.ts
-    flows.ts
-    policies.ts
-    simulation.ts
-    calibration.ts
-  data/
-    historical/
-    baseline/
-    metadata/
-  ui/
-    controls/
-    charts/
-    maps/
-    scenario/
-    layout/
-  routing/
-    scenario-url.ts
-  workers/
-    simulation-worker.ts
-```
-
 Simuleringslogikken skal ikke ligge inne i React-komponenter. UI-et skal bare
 lese scenario, sende det til modellen og vise resultatene.
 
@@ -254,7 +183,11 @@ lese scenario, sende det til modellen og vise resultatene.
 
 ### Modelltype
 
-Første modell bør være en bydelbasert stock-flow-modell.
+Første implementerte modell er en stock-flow-modell for hele Oslo. Den bør
+holdes slik til grunnmekanismene, testdataene og URL-flyten er stabile.
+
+Neste større modellsteg bør være en bydelbasert eller delbydelbasert
+stock-flow-modell.
 
 Den modellerer beholdninger og strømmer, ikke enkelthus og enkelthusholdninger.
 Beholdninger kan for eksempel være:
@@ -305,8 +238,8 @@ vurderes senere for rente, pris og leie, men øker kompleksiteten mye.
 
 Foreslåtte standardperioder:
 
-- historisk kalibrering: 2015 til siste tilgjengelige år
-- framtidsscenario: siste tilgjengelige år til 2040
+- historisk test i første implementasjon: 2015 til 2025
+- framtidsscenario i første implementasjon: 2027 til 2040
 - politisk what-if over historien: 2015 til siste tilgjengelige år
 
 ### Geografi
@@ -410,6 +343,10 @@ barnefamilier, trangboddhet og geografisk fordeling.
 Alle drivere bør representeres som tidsserier internt, også når
 brukergrensesnittet bare viser én slider.
 
+Første implementasjon støtter både konstante `ScenarioInputs` og intern
+utvidelse til `ScenarioTimeline`. Den offentlige URL-en representerer foreløpig
+bare konstante verdier for hele perioden.
+
 ```ts
 type Year = number;
 
@@ -417,13 +354,25 @@ type PolicyInputs = {
   municipalPurchases: number;
   municipalSales: number;
   nonCommercialShareOfNewBuild: number;
-  municipalShareOfNewBuild: number;
-  startLoanLevel: number;
-  housingAllowanceLevel: number;
-  secondaryHomeTaxPressure: number;
-  rentRegulationStrength: number;
 };
 
+type ExogenousInputs = {
+  interestRate: number;
+  householdGrowthRate: number;
+  constructionCostGrowth: number;
+  regulatedNewCapacity: number;
+  startedDwellingsOverride?: number;
+};
+
+type ScenarioTimeline = {
+  policies: Record<Year, PolicyInputs>;
+  exogenous: Record<Year, ExogenousInputs>;
+};
+```
+
+En senere full scenarioform kan utvides i denne retningen:
+
+```ts
 type Scenario = {
   modelVersion: string;
   startYear: Year;
@@ -435,6 +384,10 @@ type Scenario = {
   policies: Record<Year, PolicyInputs>;
 };
 ```
+
+Når statlige grep, startlån, bostøtte, tomtepolitikk og flere tildelingsregler
+innføres, bør de legges inn som eksplisitte nye policyfelt i samme
+tidslinjestruktur.
 
 Brukergrensesnittet kan starte med enkle kontrollere, men modellen bør alltid få
 en komplett tidslinje.
@@ -549,8 +502,8 @@ Kommunale grep:
 
 - kommunale boligkjøp per år
 - kommunale boligsalg per år
-- andel nybygg som blir kommunale boliger
 - andel nybygg som blir ikke-kommersielle boliger
+- andel nybygg som blir kommunale boliger
 - kommunal tomtepolitikk: salg, feste, kommunalt eie
 - krav eller mål for boligstørrelser i nye prosjekter
 - startlån-nivå
@@ -567,6 +520,11 @@ Statlige eller eksterne grep:
 
 Det bør skilles tydelig i UI mellom grep Oslo kommune kan gjøre selv, grep som
 krever statlig politikk, og eksterne makroforhold.
+
+Første implementerte UI viser kommunale kjøp, kommunale salg og ikke-kommersiell
+andel som Oslo-kommunale grep. Rente, befolkningsvekst og byggekostnadsvekst
+vises som eksterne makroforutsetninger. Statlige grep er foreløpig omtalt i UI
+som senere arbeid, ikke som aktive spaker.
 
 ## Første sentrale flyter
 
@@ -891,11 +849,22 @@ Første outputsett:
 Hvert outputmål bør ha en kort forklaring i UI: hva det betyr, hvordan det
 beregnes, og hvor usikkert det er.
 
+Første implementasjon viser:
+
+- boligprisindeks og privat leiepress som normaliserte indikatorer
+- total boligbestand
+- kommunal, privatleid, selveid og ikke-kommersiell boligbestand
+- igangsatte og ferdigstilte boliger
+- husholdninger med høy boutgiftsbelastning
+- historiske avviksmål for boligbestand og ferdigstilte boliger
+
 ## Historisk backtest
 
 Backtest er nødvendig for å gjøre modellen troverdig.
 
-Første backtest bør starte i 2015 og gå til siste tilgjengelige år.
+Første backtest starter i 2015 og går til 2025. Den bruker observerte
+igangsettinger og historisk styringsrente som input, og sammenligner modellert
+boligbestand og ferdigstillelse med observerte serier.
 
 I historisk modus bør modellen bruke faktiske historiske input der det finnes:
 
@@ -919,8 +888,9 @@ blir den for løs. Første kalibreringsmål bør derfor være begrenset.
 
 Foreslåtte første kalibreringsmål:
 
-- boligbestand etter bydel og disposisjonsform, hvis data finnes
+- total boligbestand og ferdigstilte boliger for hele Oslo
 - kommunal boligbestand
+- boligbestand etter bydel og disposisjonsform, hvis data finnes
 - boligprisindeks
 - leieindikator
 - befolknings- og husholdningsfordeling
@@ -1084,7 +1054,7 @@ styre alt direkte.
 
 ## Anbefalt første beslutning
 
-Første tekniske prototype bør være:
+Første tekniske prototype er i hovedsak bygget som:
 
 - statisk Vite/React/TypeScript-app
 - deploy til GitHub Pages
@@ -1111,4 +1081,4 @@ Grove, utskiftbare startverdier for denne første modellen ligger i
 skal ikke behandles som ferdig kalibrerte verdier for offentlig bruk.
 
 Når dette virker, kan modellen deles opp etter bydel og historisk backtest
-bygges inn.
+utvides til historisk what-if.
