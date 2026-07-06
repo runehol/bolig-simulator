@@ -292,6 +292,59 @@ Mulig senere nivå:
   seriene?
 - Kan vi lage en stabil "crosswalk" mellom delbydel, gammel bydel og ny bydel?
 
+### Samspill mellom delbydeler
+
+En delbydelmodell bør fortsatt være en stock-flow-modell, ikke en agentbasert
+modell. Delbydeler bør derfor kobles gjennom beholdninger, strømmer og
+fordelingsnøkler, ikke gjennom individuelle flyttebeslutninger.
+
+Viktig prinsipp:
+
+```text
+sum(delbydeler) = hele Oslo
+```
+
+Oslo-totalene bør beregnes først for befolkning, husholdninger, boligbestand og
+sentrale flyter. Deretter fordeles vekst, nybygg, kommunale kjøp,
+ikke-kommersiell bygging og etterspørselspress mellom delbydeler. Dette hindrer
+at geografimodellen skaper ekstra folk eller boliger.
+
+Det bør skilles mellom ny etterspørsel og eksisterende bosatte husholdninger:
+
+- innflyttere til Oslo kan fordeles relativt fritt mellom delbydeler etter
+  boligtilgang, pris, leiepress, attraktivitet og politikk
+- nye husholdninger internt i Oslo, for eksempel etter samlivsbrudd,
+  samlivsstart eller familieforøkning, går inn i en årlig fordelingspool
+- eksisterende eiere bør ha lav geografisk mobilitet uten en ekstern
+  livshendelse
+- eksisterende private leietakere bør ha høyere mobilitet, både frivillig og
+  ufrivillig, for eksempel ved oppsigelse eller sterk leieøkning
+- kommunale leietakere bør ha lav geografisk mobilitet, med mindre kommunen
+  aktivt omplasserer eller boligen faller ut
+
+Første geografiske modell bør derfor ikke la alle husholdninger konkurrere om
+alle boliger hvert år. Den bør heller bruke en mobilitetspool:
+
+```text
+bosatte husholdninger
+  -> blir boende med høy sannsynlighet
+
+mobilitetsutløste husholdninger
+  -> går inn i årlig fordelingspool
+
+nye husholdninger og innflyttere
+  -> går også inn i fordelingspool
+
+fordelingspool
+  -> fordeles på delbydeler etter boligtilbud, pris/leiepress og policy
+```
+
+Dette gir en enkel kobling mellom delbydeler uten å gjøre modellen agentbasert.
+Bygging i én delbydel kan dempe presset der og trekke noe etterspørsel fra andre
+delbydeler, men bare gjennom en dempet fordelingsrespons. Det bør være en
+eksplisitt parameter hvor sterkt delbydelene påvirker hverandre, slik at
+geografisk friksjon og bostedsstabilitet kan kalibreres.
+
 ### Husholdningsgrupper
 
 Første modell bør ha få husholdningsgrupper, slik at flytene blir forklarbare
